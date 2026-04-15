@@ -22,11 +22,11 @@ export default function ProjectsPage() {
       </div>
 
       {/* Header (Same as Dashboard) */}
-      <header className="relative z-20 border-b border-slate-800/60 backdrop-blur-md bg-[#0A0F1A]/50">
+      <header className="relative z-20 border-b border-amber-500/20 backdrop-blur-md bg-gradient-to-r from-amber-500 to-amber-700">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-              <span className="text-amber-500 font-bold text-lg">P</span>
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center border border-white/30">
+              <span className="text-white font-bold text-lg">P</span>
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-white">PENTALAND</h1>
           </div>
