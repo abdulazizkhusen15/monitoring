@@ -83,8 +83,11 @@ export default function Dashboard() {
             <p className="text-lg text-slate-400 max-w-lg leading-relaxed">
               Pantau dan kelola seluruh operasional logistik proyek dengan sistem kendali terpusat yang presisi.
             </p>
-            <button className="btn-modern px-8 py-4 rounded-xl font-semibold text-white shadow-lg flex items-center gap-3">
-              Monitoring Logistic
+            <button 
+              onClick={() => router.push('/projects')}
+              className="btn-modern px-8 py-4 rounded-xl font-semibold text-white shadow-lg flex items-center gap-3"
+            >
+              Monitoring Proyek
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
