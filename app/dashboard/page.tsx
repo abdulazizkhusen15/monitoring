@@ -25,11 +25,29 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0F1A] text-slate-100 overflow-hidden relative selection:bg-amber-500/30">
-      {/* Abstract Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-amber-500/10 rounded-full blur-[120px]"></div>
-        <div className="absolute top-[20%] -right-[5%] w-[30%] h-[30%] bg-blue-900/20 rounded-full blur-[100px]"></div>
+    <div className="min-h-screen bg-[#0A0F1A] text-slate-100 relative overflow-hidden">
+      {/* Dynamic Building Vector Background */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+        <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#FACC15" />
+              <stop offset="100%" stopColor="#CA8A04" />
+            </linearGradient>
+          </defs>
+          {/* Dense Cityscape Pattern */}
+          <g fill="url(#goldGradient)">
+            <rect x="50" y="400" width="80" height="600" rx="4" />
+            <rect x="150" y="300" width="100" height="700" rx="4" />
+            <rect x="270" y="500" width="70" height="500" rx="4" />
+            <rect x="360" y="200" width="120" height="800" rx="4" />
+            <rect x="500" y="450" width="90" height="550" rx="4" />
+            <rect x="610" y="250" width="110" height="750" rx="4" />
+            <rect x="740" y="550" width="80" height="450" rx="4" />
+            <rect x="840" y="350" width="100" height="650" rx="4" />
+            <rect x="900" y="100" width="60" height="900" rx="4" />
+          </g>
+        </svg>
       </div>
 
       {/* Navigation Header */}
@@ -53,23 +71,18 @@ export default function Dashboard() {
       {/* Dashboard Body */}
       <main className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-20">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          
-          {/* Hero Content */}
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs text-amber-500 tracking-wider font-semibold uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
               Admin Control Panel
             </div>
-            
             <h2 className="text-6xl font-extrabold tracking-tighter leading-[1.1]">
               Welcome back, <br/>
               <span className="text-gold-gradient">{username}</span>
             </h2>
-            
             <p className="text-lg text-slate-400 max-w-lg leading-relaxed">
               Pantau dan kelola seluruh operasional logistik proyek dengan sistem kendali terpusat yang presisi.
             </p>
-
             <button className="btn-modern px-8 py-4 rounded-xl font-semibold text-white shadow-lg flex items-center gap-3">
               Monitoring Logistic
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +91,6 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Feature Card */}
           <div className="relative group perspective">
             <div className="glass-card-strong rounded-3xl p-8 border-slate-700/50 shadow-2xl">
               <div className="flex items-center justify-between mb-10">
@@ -90,7 +102,6 @@ export default function Dashboard() {
                     <div className="text-sm text-green-400 font-semibold">Operational</div>
                 </div>
               </div>
-              
               <div className="space-y-6">
                 {[1, 2].map((i) => (
                     <div key={i} className="h-16 rounded-2xl border border-slate-700/50 flex items-center px-4 gap-4 bg-slate-900/30">
@@ -103,8 +114,6 @@ export default function Dashboard() {
                 ))}
               </div>
             </div>
-            
-            {/* Hover Decor */}
             <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-amber-700 rounded-[32px] opacity-10 blur-xl group-hover:opacity-20 transition-opacity"></div>
           </div>
         </div>
