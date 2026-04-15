@@ -3,5 +3,53 @@
 @tailwind utilities;
 
 body {
-  background-color: #f8f9fa;
+  background-color: #0A0F1A; /* Deep Midnight */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #E2E8F0;
 }
+
+/* Polished Glass-morphism */
+.glass-card {
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.glass-card-strong {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Refined Gold/Accent Glow */
+.golden-glow {
+  box-shadow: 0 0 40px rgba(234, 179, 8, 0.2);
+}
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, #FACC15, #EAB308, #CA8A04);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Subtle Shimmer for modern buttons */
+.btn-modern {
+  background: linear-gradient(135deg, #1E293B, #0F172A);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  transition: all 0.4s ease;
+}
+
+.btn-modern:hover {
+  border-color: #EAB308;
+  box-shadow: 0 0 20px rgba(234, 179, 8, 0.2);
+}
+
+/* Smooth scrolling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0A0F1A; }
+::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #334155; }
