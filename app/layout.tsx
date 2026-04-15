@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Sistem Hutang Karyawan',
-  description: 'Pencatatan hutang karyawan',
+  title: 'PENTALAND - Sistem Manajemen Karyawan',
+  description: 'PENTALAND - Platform manajemen karyawan yang modern dan efisien',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
