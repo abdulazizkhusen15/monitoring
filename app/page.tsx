@@ -54,6 +54,9 @@ export default function Home() {
         throw error;
       }
 
+      // Save username for local permission checking
+      localStorage.setItem('pentaland_user_alias', normalizedUser);
+
       // Refresh and hard redirect to ensure cookies are sent
       router.refresh();
       setTimeout(() => {

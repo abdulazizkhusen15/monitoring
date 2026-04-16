@@ -11,8 +11,12 @@ export default function ProjectsPage() {
   const { user } = useAuth();
   const [newProjectName, setNewProjectName] = useState('');
   const [error, setError] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const isAdmin = user?.email === 'admin@pentaland.com';
+  useEffect(() => {
+    const alias = localStorage.getItem('pentaland_user_alias');
+    setIsAdmin(alias === 'admin');
+  }, []);
 
   const handleAddProject = async () => {
     if (!newProjectName.trim()) return;
