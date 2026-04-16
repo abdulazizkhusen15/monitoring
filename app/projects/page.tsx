@@ -109,42 +109,55 @@ export default function ProjectsPage() {
 
       <main className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-20">
         <div className="grid lg:grid-cols-2 gap-20">
-          {/* Left Side: Form */}
+          {/* Left Side: Info & Form */}
           <div className="space-y-10">
             <div className="space-y-4">
                <h2 className="text-6xl font-black tracking-tighter text-slate-900 leading-none">Monitoring <br/><span className="text-gold-gradient">Proyek</span></h2>
-               <p className="text-lg text-slate-500 font-medium">Kelola dan pantau seluruh operasional proyek Pentaland dengan efisiensi tertinggi.</p>
+               <p className="text-lg text-slate-500 font-medium leading-relaxed">
+                 {isAdmin 
+                   ? 'Kelola dan pantau seluruh operasional proyek Pentaland dengan efisiensi tertinggi.' 
+                   : 'Daftar proyek aktif Pentaland. Silakan pilih proyek untuk memantau aktivitas logistik.'}
+               </p>
             </div>
             
-            <div className="glass-card-strong rounded-[40px] p-10 border-yellow-400/30 bg-gradient-to-br from-white/90 to-yellow-50/50 shadow-xl">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-8 h-8 rounded-lg bg-yellow-500 flex items-center justify-center">
-                  <span className="text-black font-black text-xs">+</span>
+            {isAdmin ? (
+              <div className="glass-card-strong rounded-[40px] p-10 border-yellow-400/30 bg-gradient-to-br from-white/90 to-yellow-50/50 shadow-xl">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-8 h-8 rounded-lg bg-yellow-500 flex items-center justify-center">
+                    <span className="text-black font-black text-xs">+</span>
+                  </div>
+                  <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">Buat Proyek Baru</h3>
                 </div>
-                <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">Buat Proyek Baru</h3>
-              </div>
 
-              <div className="space-y-4">
-                <input 
-                  type="text" 
-                  placeholder="Nama Proyek (Contoh: Pentaland Tower A)" 
-                  className={`w-full bg-slate-50 border ${error ? 'border-red-500' : 'border-slate-100'} rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-medium`}
-                  value={newProjectName}
-                  onChange={(e) => {
-                    setNewProjectName(e.target.value);
-                    if (error) setError('');
-                  }}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddProject()}
-                />
-                {error && <div className="p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-[10px] font-black uppercase tracking-widest">{error}</div>}
-                <button 
-                  onClick={handleAddProject}
-                  className="w-full btn-modern py-5 rounded-2xl shadow-xl shadow-yellow-500/20 active:scale-95 transition-transform"
-                >
-                  Daftarkan Proyek
-                </button>
+                <div className="space-y-4">
+                  <input 
+                    type="text" 
+                    placeholder="Nama Proyek (Contoh: Pentaland Tower A)" 
+                    className={`w-full bg-slate-50 border ${error ? 'border-red-500' : 'border-slate-100'} rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-medium`}
+                    value={newProjectName}
+                    onChange={(e) => {
+                      setNewProjectName(e.target.value);
+                      if (error) setError('');
+                    }}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddProject()}
+                  />
+                  {error && <div className="p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-[10px] font-black uppercase tracking-widest">{error}</div>}
+                  <button 
+                    onClick={handleAddProject}
+                    className="w-full btn-modern py-5 rounded-2xl shadow-xl shadow-yellow-500/20 active:scale-95 transition-transform"
+                  >
+                    Daftarkan Proyek
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="glass-card-strong rounded-[40px] p-10 border-slate-100 bg-white/40 shadow-sm">
+                <div className="flex items-center gap-4 text-slate-400">
+                  <ShieldCheck className="w-6 h-6" />
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em]">Akses Terbatas: Operator Logistik</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Side: List */}
@@ -200,8 +213,8 @@ export default function ProjectsPage() {
                         )}
                         
                         <button 
-                          onClick={() => toggleProjectStatus(p.id, p.status)}
-                          className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${p.status ? 'bg-green-500/10 text-green-600 border border-green-500/10' : 'bg-red-500/10 text-red-500 border border-red-500/10'}`}
+                          onClick={() => isAdmin && toggleProjectStatus(p.id, p.status)}
+                          className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${p.status ? 'bg-green-500/10 text-green-600 border border-green-500/10' : 'bg-red-500/10 text-red-500 border border-red-500/10'} ${!isAdmin ? 'cursor-default opacity-70' : 'hover:scale-105 active:scale-95'}`}
                         >
                           {p.status ? 'Aktif' : 'Non-Aktif'}
                         </button>
