@@ -7,8 +7,7 @@ import { useAuth } from './context/AuthContext';
 
 export default function Home() {
   const { user, loading: authLoading } = useAuth();
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,22 +26,28 @@ export default function Home() {
     setLoading(true);
 
     try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        if (error) throw error;
-        setError('Pendaftaran berhasil! Silakan cek email Anda untuk konfirmasi (jika diperlukan) atau coba login.');
-        setIsSignUp(false);
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        router.push('/dashboard');
+      // Internal mapping for admin/admin
+      if (username.toLowerCase() !== 'admin' || password !== 'admin') {
+        throw new Error('Username atau password salah');
       }
+
+      // We use a fixed internal email for the single admin account
+      const adminEmail = 'admin@pentaland.com';
+      const adminPassword = 'admin_pentaland_secure_123'; // Internal password for Supabase Auth
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: adminEmail,
+        password: adminPassword,
+      });
+
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Akun admin belum terdaftar di sistem. Hubungi pengembang.');
+        }
+        throw error;
+      }
+
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan autentikasi');
     } finally {
@@ -102,7 +107,7 @@ export default function Home() {
           {/* Form Content */}
           <div className="px-10 py-10">
             <h2 className="text-2xl font-black text-slate-900 mb-8 text-center uppercase tracking-tight">
-              {isSignUp ? 'Daftar Akun Baru' : 'Selamat Datang Kembali'}
+              Selamat Datang Kembali
             </h2>
 
             {error && (
@@ -114,14 +119,14 @@ export default function Home() {
             <form onSubmit={handleAuth} className="space-y-6">
               <div>
                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 mb-2">
-                  Email Address
+                  Username
                 </label>
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="w-full bg-white/60 border border-yellow-200 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold placeholder:text-slate-300"
-                  placeholder="name@example.com"
+                  placeholder="admin"
                   required
                 />
               </div>
@@ -154,16 +159,8 @@ export default function Home() {
                     Memproses...
                   </span>
                 ) : (
-                  isSignUp ? 'Mulai Pendaftaran' : 'Masuk Dashboard'
+                  'Masuk Dashboard'
                 )}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="w-full text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-amber-600 transition-colors"
-              >
-                {isSignUp ? 'Sudah punya akun? Login' : 'Belum punya akun? Daftar'}
               </button>
             </form>
 
