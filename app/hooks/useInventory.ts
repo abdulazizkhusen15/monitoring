@@ -25,8 +25,8 @@ export function useInventory(projectId: string, itemId: string) {
     }, { totalIn: 0, totalOut: 0, totalUsage: 0, currentStock: 0 });
   }, [transactions]);
 
-  const addGoodsIn = (data: { quantity: number; notes?: string; date: string }) => {
-    return addTransaction({
+  const addGoodsIn = async (data: { quantity: number; notes?: string; date: string }) => {
+    return await addTransaction({
       projectId,
       itemId,
       type: 'IN',
@@ -34,11 +34,11 @@ export function useInventory(projectId: string, itemId: string) {
     });
   };
 
-  const addGoodsOut = (data: { quantity: number; notes?: string; date: string }) => {
+  const addGoodsOut = async (data: { quantity: number; notes?: string; date: string }) => {
     if (data.quantity > summary.currentStock) {
       return { success: false, message: 'Stok tidak mencukupi!' };
     }
-    return addTransaction({
+    return await addTransaction({
       projectId,
       itemId,
       type: 'OUT',
@@ -46,11 +46,11 @@ export function useInventory(projectId: string, itemId: string) {
     });
   };
 
-  const addUsage = (data: { quantity: number; notes?: string; date: string }) => {
+  const addUsage = async (data: { quantity: number; notes?: string; date: string }) => {
     if (data.quantity > summary.currentStock) {
       return { success: false, message: 'Stok tidak mencukupi!' };
     }
-    return addTransaction({
+    return await addTransaction({
       projectId,
       itemId,
       type: 'USAGE',

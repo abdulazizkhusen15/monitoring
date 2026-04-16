@@ -1,28 +1,28 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
+import { useProject } from '../context/ProjectContext';
 
-export default function Dashboard() {
+export default function DashboardPage() {
   const router = useRouter();
-  const [username, setUsername] = useState('');
+  const { user, signOut } = useAuth();
+  const { loading } = useProject();
+  
+  const username = user?.email?.split('@')[0] || 'Admin';
 
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem('admin_logged_in');
-    const adminUser = localStorage.getItem('admin_username');
-
-    if (!isLoggedIn) {
-      router.push('/');
-    } else {
-      setUsername(adminUser || 'Administrator');
-    }
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('admin_logged_in');
-    localStorage.removeItem('admin_username');
+  const handleLogout = async () => {
+    await signOut();
     router.push('/');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFFBEB]">
+        <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden selection:bg-amber-200">

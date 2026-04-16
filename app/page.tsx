@@ -1,159 +1,174 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from './context/AuthContext';
 
 export default function Home() {
-  const [username, setUsername] = useState('');
+  const { user, loading: authLoading } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !authLoading) {
+      router.push('/dashboard');
+    }
+  }, [user, authLoading, router]);
+
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || 'Login gagal');
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (error) throw error;
+        setError('Pendaftaran berhasil! Silakan cek email Anda untuk konfirmasi (jika diperlukan) atau coba login.');
+        setIsSignUp(false);
       } else {
-        // Simpan session di localStorage
-        localStorage.setItem('admin_logged_in', 'true');
-        localStorage.setItem('admin_username', data.username);
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
         router.push('/dashboard');
       }
-    } catch (err) {
-      setError('Terjadi kesalahan saat login');
+    } catch (err: any) {
+      setError(err.message || 'Terjadi kesalahan autentikasi');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <main className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Background dengan gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-yellow-50 via-white to-yellow-100"></div>
-      
-      {/* Decorative circles */}
-      <div className="absolute top-20 left-20 w-72 h-72 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-      <div className="absolute bottom-20 right-20 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-yellow-100 rounded-full mix-blend-multiply filter blur-xl opacity-20"></div>
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFFBEB]">
+        <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
+  return (
+    <main className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#FFFBEB]">
+      {/* Background Decor */}
+      <div className="absolute inset-0 opacity-[0.6] pointer-events-none">
+        <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#FDE68A" />
+              <stop offset="50%" stopColor="#FACC15" />
+              <stop offset="100%" stopColor="#CA8A04" />
+            </linearGradient>
+          </defs>
+          <g fill="url(#goldGradient)" opacity="0.15">
+            <circle cx="100" cy="100" r="300" />
+            <circle cx="900" cy="900" r="400" />
+            <path d="M400,100 Q600,300 400,500 T400,900" stroke="url(#goldGradient)" strokeWidth="2" fill="none" />
+          </g>
+        </svg>
+      </div>
+      
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-md mx-4">
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-200 overflow-hidden">
-          {/* Header dengan gradient emas */}
-          <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 px-8 py-10 text-center relative overflow-hidden">
-            {/* Decorative shine effect */}
+        <div className="glass-card-strong rounded-[48px] border-yellow-400/30 overflow-hidden bg-gradient-to-br from-white/90 to-yellow-50/50 shadow-2xl">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 px-8 py-12 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 animate-pulse"></div>
             
             <div className="relative z-10">
-              {/* Logo/Icon */}
-              <div className="mx-auto mb-4 w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/50">
-                <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                </svg>
+              <div className="mx-auto mb-6 w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center border-2 border-white/50 shadow-xl">
+                <span className="text-white font-black text-4xl">P</span>
               </div>
               
-              <h1 className="text-4xl font-bold text-white tracking-wider drop-shadow-lg">
+              <h1 className="text-4xl font-black text-white tracking-tighter drop-shadow-lg">
                 PENTALAND
               </h1>
-              <p className="text-yellow-100 mt-2 text-sm">
-                Sistem Manajemen Karyawan
+              <p className="text-yellow-100 mt-2 text-[10px] font-black uppercase tracking-[0.3em] opacity-80">
+                Project Dashboard Control
               </p>
             </div>
           </div>
 
-          {/* Login Form */}
-          <div className="px-8 py-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-              Masuk ke Akun Anda
+          {/* Form Content */}
+          <div className="px-10 py-10">
+            <h2 className="text-2xl font-black text-slate-900 mb-8 text-center uppercase tracking-tight">
+              {isSignUp ? 'Daftar Akun Baru' : 'Selamat Datang Kembali'}
             </h2>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+              <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-[10px] font-black uppercase tracking-widest leading-relaxed">
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleLogin} className="space-y-5">
-              {/* Username */}
+            <form onSubmit={handleAuth} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Username
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 mb-2">
+                  Email Address
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all outline-none"
-                    placeholder="Masukkan username"
-                    required
-                  />
-                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-white/60 border border-yellow-200 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold placeholder:text-slate-300"
+                  placeholder="name@example.com"
+                  required
+                />
               </div>
 
-              {/* Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 mb-2">
                   Password
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all outline-none"
-                    placeholder="Masukkan password"
-                    required
-                  />
-                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-white/60 border border-yellow-200 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold placeholder:text-slate-300"
+                  placeholder="••••••••"
+                  required
+                />
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white py-3 rounded-lg font-semibold hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 focus:ring-4 focus:ring-yellow-300 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+                className="w-full btn-modern py-5 rounded-2xl shadow-xl shadow-yellow-500/20 active:scale-95 transition-transform"
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
-                    <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
                     Memproses...
                   </span>
                 ) : (
-                  'Masuk'
+                  isSignUp ? 'Mulai Pendaftaran' : 'Masuk Dashboard'
                 )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="w-full text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-amber-600 transition-colors"
+              >
+                {isSignUp ? 'Sudah punya akun? Login' : 'Belum punya akun? Daftar'}
               </button>
             </form>
 
-            {/* Footer */}
-            <div className="mt-6 text-center text-xs text-gray-500">
-              <p>&copy; 2026 PENTALAND. All rights reserved.</p>
+            <div className="mt-10 text-center">
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">&copy; 2026 PENTALAND. Monitoring System.</p>
             </div>
           </div>
         </div>

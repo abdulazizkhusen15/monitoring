@@ -1,17 +1,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { InventoryTransaction, ProjectItem, TransactionType } from '../types/inventory';
+import { InventoryTransaction, ProjectItem } from '../types/inventory';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from './AuthContext';
 
-interface Project extends Omit<ProjectItem, 'itemId'> {
-  id: string;
-  name: string;
-  status: boolean;
-  createdAt: string;
-  items: ProjectItem[];
-}
-
-// Full Project interface update
 export interface ProjectExtended {
   id: string;
   name: string;
@@ -23,149 +16,267 @@ export interface ProjectExtended {
 
 interface ProjectContextType {
   projects: ProjectExtended[];
-  addProject: (name: string) => { success: boolean; message: string; data?: any };
-  toggleProjectStatus: (id: string) => void;
-  addProjectItem: (projectId: string, name: string, itemCode: string, unit: string) => { success: boolean; message: string; data?: any };
-  addTransaction: (transaction: Omit<InventoryTransaction, 'id' | 'createdAt'>) => { success: boolean; message: string; data?: any };
-  removeProjectItem: (projectId: string, itemId: string) => void;
+  loading: boolean;
+  addProject: (name: string) => Promise<{ success: boolean; message: string; data?: any }>;
+  toggleProjectStatus: (id: string, currentStatus: boolean) => Promise<void>;
+  addProjectItem: (projectId: string, name: string, itemCode: string, unit: string) => Promise<{ success: boolean; message: string; data?: any }>;
+  addTransaction: (transaction: Omit<InventoryTransaction, 'id' | 'createdAt'>) => Promise<{ success: boolean; message: string; data?: any }>;
+  removeProjectItem: (projectId: string, itemId: string) => Promise<void>;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
   const [projects, setProjects] = useState<ProjectExtended[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('pentaland_projects_v2');
-    if (saved) {
-      try {
-        setProjects(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to parse saved projects', e);
-      }
+  // 1. Fetch data from Supabase
+  const fetchData = async () => {
+    if (!user) {
+      setProjects([]);
+      setLoading(false);
+      return;
     }
-    setIsInitialized(true);
-  }, []);
 
-  // Save to localStorage whenever projects change
-  useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem('pentaland_projects_v2', JSON.stringify(projects));
+    try {
+      setLoading(true);
+      
+      // Fetch projects
+      const { data: dbProjects, error: pError } = await supabase
+        .from('projects')
+        .select(`
+          *,
+          items:project_items(*),
+          transactions:inventory_transactions(*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (pError) throw pError;
+
+      // Map to ProjectExtended interface
+      const mapped: ProjectExtended[] = (dbProjects || []).map(p => ({
+        id: p.id,
+        name: p.name,
+        status: p.status,
+        createdAt: p.created_at,
+        items: p.items || [],
+        transactions: p.transactions || []
+      }));
+
+      setProjects(mapped);
+    } catch (err) {
+      console.error('Error fetching data:', err);
+    } finally {
+      setLoading(false);
     }
-  }, [projects, isInitialized]);
-
-  // Logging utility
-  const logOperation = (action: string, result: any) => {
-    console.log(JSON.stringify({
-      timestamp: new Date().toISOString(),
-      action,
-      ...result
-    }, null, 2));
   };
 
-  const addProject = (name: string) => {
-    if (name.trim().length < 3) {
-      const result = { success: false, message: 'Nama proyek minimal 3 karakter' };
-      logOperation('ADD_PROJECT', result);
-      return result;
-    }
+  // 2. Auto-Migration from localStorage
+  const handleMigration = async () => {
+    if (!user) return;
+    
+    const saved = localStorage.getItem('pentaland_projects_v2');
+    if (!saved) return;
 
-    if (projects.some(p => p.name.toLowerCase() === name.trim().toLowerCase())) {
-      const result = { success: false, message: 'Nama proyek sudah ada' };
-      logOperation('ADD_PROJECT', result);
-      return result;
+    try {
+      const localProjects: ProjectExtended[] = JSON.parse(saved);
+      if (localProjects.length === 0) return;
+
+      console.log('Migrating local data to cloud...');
+      
+      for (const lp of localProjects) {
+        // Insert Project
+        const { data: newProj, error: pErr } = await supabase
+          .from('projects')
+          .insert({ name: lp.name, status: lp.status, user_id: user.id })
+          .select()
+          .single();
+
+        if (pErr) continue;
+
+        // Insert Items
+        if (lp.items.length > 0) {
+          const itemsToInsert = lp.items.map(i => ({
+            project_id: newProj.id,
+            user_id: user.id,
+            name: i.name,
+            item_code: i.itemCode,
+            unit: i.unit,
+            is_completed: i.isCompleted
+          }));
+          
+          const { data: newItems, error: iErr } = await supabase
+            .from('project_items')
+            .insert(itemsToInsert)
+            .select();
+
+          if (iErr) continue;
+
+          // Insert Transactions
+          if (lp.transactions.length > 0) {
+             const transactionsToInsert = lp.transactions.map(t => {
+                // Find matching new item ID by item_code
+                const matchedItem = newItems.find(ni => ni.item_code === t.itemCode);
+                return {
+                  project_id: newProj.id,
+                  item_id: matchedItem?.id,
+                  user_id: user.id,
+                  type: t.type,
+                  quantity: t.quantity,
+                  date: t.date,
+                  notes: t.notes
+                };
+             }).filter(t => t.item_id);
+
+             await supabase.from('inventory_transactions').insert(transactionsToInsert);
+          }
+        }
+      }
+
+      // Clear local storage after successful migration
+      localStorage.removeItem('pentaland_projects_v2');
+      fetchData();
+    } catch (e) {
+      console.error('Migration failed:', e);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      handleMigration().then(() => fetchData());
+    } else {
+      setProjects([]);
+      setLoading(false);
+    }
+  }, [user]);
+
+  const addProject = async (name: string) => {
+    if (!user) return { success: false, message: 'Harus login' };
+
+    const { data, error } = await supabase
+      .from('projects')
+      .insert({ name: name.trim(), user_id: user.id })
+      .select()
+      .single();
+
+    if (error) {
+      return { success: false, message: error.code === '23505' ? 'Nama proyek sudah ada' : error.message };
     }
 
     const newProject: ProjectExtended = {
-      id: Date.now().toString(),
-      name: name.trim(),
-      status: true,
-      createdAt: new Date().toISOString(),
+      id: data.id,
+      name: data.name,
+      status: data.status,
+      createdAt: data.created_at,
       items: [],
       transactions: []
     };
 
-    setProjects(prev => [...prev, newProject]);
-    const result = { success: true, message: 'Proyek berhasil ditambahkan', data: newProject };
-    logOperation('ADD_PROJECT', result);
-    return result;
+    setProjects(prev => [newProject, ...prev]);
+    return { success: true, message: 'Proyek berhasil ditambahkan', data: newProject };
   };
 
-  const toggleProjectStatus = (id: string) => {
-    setProjects(prev => prev.map(p => p.id === id ? { ...p, status: !p.status } : p));
-  };
+  const toggleProjectStatus = async (id: string, currentStatus: boolean) => {
+    const { error } = await supabase
+      .from('projects')
+      .update({ status: !currentStatus })
+      .eq('id', id);
 
-  const addProjectItem = (projectId: string, name: string, itemCode: string, unit: string) => {
-    const project = projects.find(p => p.id === projectId);
-    if (!project) return { success: false, message: 'Proyek tidak ditemukan' };
-
-    // Validation: Check if itemCode already exists in ANY project and has a different unit
-    const existingItemWithSameCode = projects.flatMap(p => p.items).find(i => i.itemCode === itemCode);
-    if (existingItemWithSameCode && existingItemWithSameCode.unit !== unit) {
-      const result = { 
-        success: false, 
-        message: `Peringatan: Satuan tidak boleh diubah untuk Kode Barang '${itemCode}'! Satuan yang terdaftar adalah: ${existingItemWithSameCode.unit}` 
-      };
-      logOperation('ADD_ITEM_VALIDATION_ERROR', result);
-      return result;
+    if (!error) {
+      setProjects(prev => prev.map(p => p.id === id ? { ...p, status: !currentStatus } : p));
     }
+  };
 
-    if (project.items.some(item => item.name.toLowerCase() === name.trim().toLowerCase())) {
-      const result = { success: false, message: 'Barang sudah ada dalam proyek ini' };
-      logOperation('ADD_ITEM', result);
-      return result;
+  const addProjectItem = async (projectId: string, name: string, itemCode: string, unit: string) => {
+    if (!user) return { success: false, message: 'Harus login' };
+
+    const { data, error } = await supabase
+      .from('project_items')
+      .insert({
+        project_id: projectId,
+        user_id: user.id,
+        name: name.trim(),
+        item_code: itemCode.trim(),
+        unit
+      })
+      .select()
+      .single();
+
+    if (error) {
+      return { success: false, message: error.message };
     }
 
     const newItem: ProjectItem = {
-      id: Date.now().toString(),
+      id: data.id,
       project_id: projectId,
-      name: name.trim(),
-      itemCode: itemCode.trim(),
-      unit,
-      createdAt: new Date().toISOString(),
-      isCompleted: false
+      name: data.name,
+      itemCode: data.item_code,
+      unit: data.unit,
+      createdAt: data.created_at,
+      isCompleted: data.is_completed
     };
 
     setProjects(prev => prev.map(p => 
       p.id === projectId ? { ...p, items: [...p.items, newItem] } : p
     ));
 
-    const result = { success: true, message: 'Barang berhasil ditambahkan', data: newItem };
-    logOperation('ADD_ITEM', result);
-    return result;
+    return { success: true, message: 'Barang berhasil ditambahkan', data: newItem };
   };
 
-  const addTransaction = (data: Omit<InventoryTransaction, 'id' | 'createdAt'>) => {
+  const addTransaction = async (data: Omit<InventoryTransaction, 'id' | 'createdAt'>) => {
+    if (!user) return { success: false, message: 'Harus login' };
+
+    const { data: dbData, error } = await supabase
+      .from('inventory_transactions')
+      .insert({
+        project_id: data.projectId,
+        item_id: data.itemId,
+        user_id: user.id,
+        type: data.type,
+        quantity: data.quantity,
+        date: data.date,
+        notes: data.notes
+      })
+      .select()
+      .single();
+
+    if (error) return { success: false, message: error.message };
+
     const transaction: InventoryTransaction = {
       ...data,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
+      id: dbData.id,
+      createdAt: dbData.created_at
     };
 
     setProjects(prev => prev.map(p => 
       p.id === data.projectId ? { ...p, transactions: [...p.transactions, transaction] } : p
     ));
 
-    const result = { success: true, message: 'Transaksi berhasil dicatat', data: transaction };
-    logOperation('ADD_TRANSACTION', result);
-    return result;
+    return { success: true, message: 'Transaksi berhasil dicatat', data: transaction };
   };
 
-  const removeProjectItem = (projectId: string, itemId: string) => {
-    setProjects(prev => prev.map(p => 
-      p.id === projectId ? { 
-        ...p, 
-        items: p.items.filter(i => i.id !== itemId),
-        transactions: p.transactions.filter(t => t.itemId !== itemId)
-      } : p
-    ));
+  const removeProjectItem = async (projectId: string, itemId: string) => {
+    const { error } = await supabase
+      .from('project_items')
+      .delete()
+      .eq('id', itemId);
+
+    if (!error) {
+      setProjects(prev => prev.map(p => 
+        p.id === projectId ? { 
+          ...p, 
+          items: p.items.filter(i => i.id !== itemId),
+          transactions: p.transactions.filter(t => t.itemId !== itemId)
+        } : p
+      ));
+    }
   };
 
   return (
     <ProjectContext.Provider value={{
       projects,
+      loading,
       addProject,
       toggleProjectStatus,
       addProjectItem,

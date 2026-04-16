@@ -10,7 +10,7 @@ import { Package, Plus, ChevronRight, Settings } from 'lucide-react';
 export default function ProjectDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { projects, addProjectItem, removeProjectItem, toggleProjectStatus } = useProject();
+  const { projects, loading, addProjectItem, removeProjectItem, toggleProjectStatus } = useProject();
   
   const project = projects.find(p => p.id === id);
   
@@ -19,23 +19,14 @@ export default function ProjectDetailPage() {
   const [unit, setUnit] = useState<Unit>(VALID_UNITS[0]);
   const [error, setError] = useState('');
 
-  if (!project) {
-    return (
-      <div className="min-h-screen bg-[#0A0F1A] flex items-center justify-center text-white p-6 text-center">
-        <div>
-          <h1 className="text-3xl font-bold mb-4 text-white">Proyek Tidak Ditemukan</h1>
-          <button onClick={() => router.push('/projects')} className="text-amber-500 hover:text-amber-400 font-bold">Kembali ke Daftar Proyek</button>
-        </div>
-      </div>
-    );
-  }
-
-  const handleAddItem = () => {
+  const handleAddItem = async () => {
     if (!itemName || !itemCode || !unit) {
       setError('Semua kolom wajib diisi');
       return;
     }
-    const result = addProjectItem(project.id, itemName, itemCode, unit);
+    if (!project) return;
+    
+    const result = await addProjectItem(project.id, itemName, itemCode, unit);
     if (result.success) {
       setItemName('');
       setItemCode('');
@@ -44,6 +35,26 @@ export default function ProjectDetailPage() {
       setError(result.message);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFFBEB]">
+        <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 text-center">
+        <div className="glass-card-strong p-12 rounded-[48px] border-yellow-400/30 bg-gradient-to-br from-white/95 to-yellow-50/60 shadow-2xl max-w-md">
+          <Package className="w-16 h-16 text-yellow-500 mx-auto mb-6 opacity-20" />
+          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-4">Proyek Tidak Ditemukan</h1>
+          <button onClick={() => router.push('/projects')} className="btn-modern px-10 py-5 rounded-2xl w-full">Kembali</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden pb-20">
@@ -129,9 +140,9 @@ export default function ProjectDetailPage() {
                       </div>
                     </Link>
                     <button 
-                      onClick={(e) => {
+                      onClick={async (e) => {
                         e.preventDefault();
-                        removeProjectItem(project.id, item.id);
+                        await removeProjectItem(project.id, item.id);
                       }}
                       className="absolute -right-3 -top-3 z-20 w-10 h-10 rounded-full bg-white border border-red-100 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shadow-xl"
                       aria-label="Hapus"
@@ -214,7 +225,7 @@ export default function ProjectDetailPage() {
               </div>
               <p className="text-xs text-slate-500 mb-8 leading-relaxed font-medium relative z-10">Status proyek menentukan kemunculan proyek di layar monitoring utama Pentaland.</p>
               <button 
-                onClick={() => toggleProjectStatus(project.id)}
+                onClick={async () => await toggleProjectStatus(project.id, project.status)}
                 className={`w-full py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] border transition-all relative z-10 ${project.status ? 'bg-white border-red-100 text-red-500 hover:bg-red-50' : 'bg-white border-green-100 text-green-600 hover:bg-green-50'}`}
               >
                 {project.status ? 'Hentikan Monitoring' : 'Mulai Monitoring'}

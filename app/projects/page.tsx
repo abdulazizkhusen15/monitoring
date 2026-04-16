@@ -5,12 +5,13 @@ import { useProject } from '@/app/context/ProjectContext';
 import Link from 'next/link';
 
 export default function ProjectsPage() {
-  const { projects, addProject, toggleProjectStatus } = useProject();
+  const { projects, loading, addProject, toggleProjectStatus } = useProject();
   const [newProjectName, setNewProjectName] = useState('');
   const [error, setError] = useState('');
 
-  const handleAddProject = () => {
-    const result = addProject(newProjectName);
+  const handleAddProject = async () => {
+    if (!newProjectName.trim()) return;
+    const result = await addProject(newProjectName);
     if (result.success) {
       setNewProjectName('');
       setError('');
@@ -18,6 +19,14 @@ export default function ProjectsPage() {
       setError(result.message);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFFBEB]">
+        <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -118,7 +127,7 @@ export default function ProjectsPage() {
                         </div>
                       </Link>
                       <button 
-                        onClick={() => toggleProjectStatus(p.id)}
+                        onClick={() => toggleProjectStatus(p.id, p.status)}
                         className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${p.status ? 'bg-green-500/10 text-green-600 border border-green-500/10' : 'bg-red-500/10 text-red-500 border border-red-500/10'}`}
                       >
                         {p.status ? 'Aktif' : 'Non-Aktif'}

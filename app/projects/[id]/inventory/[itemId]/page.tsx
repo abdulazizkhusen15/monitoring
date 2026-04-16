@@ -3,16 +3,18 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useInventory } from '@/app/hooks/useInventory';
+import { useProject } from '@/app/context/ProjectContext';
 import SummaryCards from '@/app/components/inventory/SummaryCards';
 import GoodsTable from '@/app/components/inventory/GoodsTable';
 import ModalGoodsIn from '@/app/components/inventory/ModalGoodsIn';
 import ModalGoodsOut from '@/app/components/inventory/ModalGoodsOut';
-import { ArrowLeft, Plus, Send, PenTool, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Plus, Send, PenTool, AlertCircle, Package } from 'lucide-react';
 import Link from 'next/link';
 
 export default function InventoryPage() {
   const { id: projectId, itemId } = useParams();
   const router = useRouter();
+  const { loading } = useProject();
   
   const { 
     project, 
@@ -28,18 +30,25 @@ export default function InventoryPage() {
   const [isModalInOpen, setIsModalInOpen] = useState(false);
   const [modalOutConfig, setModalOutConfig] = useState<{ open: boolean, type: 'OUT' | 'USAGE' }>({ open: false, type: 'OUT' });
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFFBEB]">
+        <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   if (!project || !item) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6 text-center">
         <div className="glass-card-strong p-12 rounded-[48px] border-yellow-400/30 bg-gradient-to-br from-white/95 to-yellow-50/60 shadow-2xl max-w-md">
-          <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-6" />
+          <Package className="w-16 h-16 text-yellow-500 mx-auto mb-6 opacity-20" />
           <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-4">Data Tidak Ditemukan</h1>
           <p className="text-sm text-slate-500 font-bold uppercase tracking-widest mb-8">Informasi proyek atau item logistik tidak tersedia atau telah dihapus.</p>
           <button 
-            onClick={() => router.back()} 
-            className="btn-modern px-10 py-5 rounded-2xl w-full flex items-center justify-center gap-3"
+            onClick={() => router.push('/projects')} 
+            className="btn-modern px-10 py-5 rounded-2xl w-full"
           >
-            <ArrowLeft className="w-5 h-5" />
             Kembali
           </button>
         </div>
@@ -186,8 +195,8 @@ export default function InventoryPage() {
       <ModalGoodsIn 
         isOpen={isModalInOpen} 
         onClose={() => setIsModalInOpen(false)} 
-        onSubmit={(data) => {
-          const res = addGoodsIn(data);
+        onSubmit={async (data) => {
+          const res = await addGoodsIn(data);
           if (!res.success) alert(res.message);
         }}
         unit={item.unit}
@@ -198,10 +207,10 @@ export default function InventoryPage() {
         onClose={() => setModalOutConfig({ ...modalOutConfig, open: false })}
         type={modalOutConfig.type}
         maxQuantity={summary.currentStock}
-        onSubmit={(data) => {
+        onSubmit={async (data) => {
           let res;
-          if (modalOutConfig.type === 'OUT') res = addGoodsOut(data);
-          else res = addUsage(data);
+          if (modalOutConfig.type === 'OUT') res = await addGoodsOut(data);
+          else res = await addUsage(data);
           
           if (!res.success) alert(res.message);
         }}
