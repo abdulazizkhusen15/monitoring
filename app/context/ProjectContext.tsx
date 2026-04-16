@@ -191,6 +191,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       name: data.name,
       status: data.status,
       createdAt: data.created_at,
+      pin: data.pin || null,
       items: [],
       transactions: []
     };
