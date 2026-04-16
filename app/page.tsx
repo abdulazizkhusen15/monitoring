@@ -47,7 +47,10 @@ export default function Home() {
         throw error;
       }
 
-      router.push('/dashboard');
+      // Small delay before redirecting
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 100);
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan autentikasi');
     } finally {
