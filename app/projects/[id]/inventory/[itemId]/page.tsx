@@ -28,42 +28,45 @@ export default function InventoryPage() {
   const [isModalInOpen, setIsModalInOpen] = useState(false);
   const [modalOutConfig, setModalOutConfig] = useState<{ open: boolean, type: 'OUT' | 'USAGE' }>({ open: false, type: 'OUT' });
 
-  if (!project || !item) {
-    return (
-      <div className="min-h-screen bg-[#0A0F1A] flex items-center justify-center text-white">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold">Data Tidak Ditemukan</h1>
-          <button onClick={() => router.back()} className="mt-4 text-amber-500 hover:underline">Kembali</button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen relative overflow-hidden pb-20">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-yellow-500/5 to-transparent pointer-events-none"></div>
+      {/* Elegant Light Abstract Background */}
+      <div className="absolute inset-0 opacity-[0.6] pointer-events-none">
+        <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#FDE68A" />
+              <stop offset="50%" stopColor="#FACC15" />
+              <stop offset="100%" stopColor="#CA8A04" />
+            </linearGradient>
+          </defs>
+          <g fill="url(#goldGradient)" opacity="0.15">
+            <circle cx="100" cy="100" r="300" />
+            <circle cx="900" cy="900" r="400" />
+            <path d="M400,100 Q600,300 400,500 T400,900" stroke="url(#goldGradient)" strokeWidth="2" fill="none" />
+          </g>
+        </svg>
+      </div>
 
-      <header className="relative z-20 border-b border-yellow-500/10 backdrop-blur-xl bg-white/40 sticky top-0">
+      <header className="relative z-20 border-b border-yellow-500/20 backdrop-blur-xl bg-white/60 sticky top-0 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link 
               href={`/projects/${projectId}`}
-              className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center hover:bg-yellow-500 hover:text-black transition-all shadow-sm group"
+              className="w-12 h-12 rounded-2xl bg-white border border-yellow-200 flex items-center justify-center hover:bg-yellow-500 hover:text-black transition-all shadow-sm group"
             >
               <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
             </Link>
             <div>
-              <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight leading-none mb-1">{item.name}</h1>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                {project.name} <span className="w-1 h-1 bg-slate-200 rounded-full"></span> {item.itemCode}
+              <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none mb-1">{item.name}</h1>
+              <p className="text-[10px] font-black text-amber-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                {project.name} <span className="w-1 h-1 bg-yellow-200 rounded-full"></span> {item.itemCode}
               </p>
             </div>
           </div>
           
           <div className="flex items-center gap-4">
-             <span className="px-4 py-2 rounded-xl bg-slate-50 border border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-500">
+             <span className="px-4 py-2 rounded-xl bg-white/50 border border-yellow-200 text-[10px] font-black uppercase tracking-widest text-slate-500 shadow-sm">
                Satuan: <span className="text-amber-600 font-black">{item.unit.toUpperCase()}</span>
              </span>
           </div>

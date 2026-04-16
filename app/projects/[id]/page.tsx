@@ -46,13 +46,29 @@ export default function ProjectDetailPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-yellow-400/5 blur-[120px] rounded-full -mr-64 -mt-64"></div>
+    <div className="min-h-screen relative overflow-hidden pb-20">
+      {/* Elegant Light Abstract Background */}
+      <div className="absolute inset-0 opacity-[0.6] pointer-events-none">
+        <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#FDE68A" />
+              <stop offset="50%" stopColor="#FACC15" />
+              <stop offset="100%" stopColor="#CA8A04" />
+            </linearGradient>
+          </defs>
+          <g fill="url(#goldGradient)" opacity="0.15">
+            <circle cx="100" cy="100" r="300" />
+            <circle cx="900" cy="900" r="400" />
+            <path d="M400,100 Q600,300 400,500 T400,900" stroke="url(#goldGradient)" strokeWidth="2" fill="none" />
+          </g>
+        </svg>
+      </div>
       
-      <header className="relative z-20 border-b border-yellow-500/10 backdrop-blur-xl bg-white/40 sticky top-0">
+      <header className="relative z-20 border-b border-yellow-500/20 backdrop-blur-xl bg-white/60 sticky top-0 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <Link href="/projects" className="flex items-center gap-2 text-slate-500 hover:text-amber-600 transition-all font-black text-xs uppercase tracking-widest">
-            <ChevronRight className="w-4 h-4 rotate-180" />
+          <Link href="/projects" className="flex items-center gap-2 text-slate-500 hover:text-amber-600 transition-all font-black text-xs uppercase tracking-widest bg-white/50 px-4 py-2 rounded-xl border border-yellow-200 shadow-sm group">
+            <ChevronRight className="w-4 h-4 rotate-180 transition-transform group-hover:-translate-x-1" />
             Kembali
           </Link>
           <div className="flex items-center gap-4">
@@ -89,7 +105,7 @@ export default function ProjectDetailPage() {
                   <div key={item.id} className="group relative">
                     <Link 
                       href={`/projects/${project.id}/inventory/${item.id}`}
-                      className="block glass-card-strong p-8 rounded-[40px] border-slate-100 hover:border-yellow-500/40 hover:bg-white transition-all relative z-10"
+                      className="block glass-card-strong p-8 rounded-[40px] border-yellow-400/30 bg-gradient-to-br from-white/95 to-yellow-50/60 hover:border-yellow-500/60 hover:shadow-2xl hover:shadow-yellow-500/10 transition-all relative z-10"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-8 text-left">
@@ -130,7 +146,7 @@ export default function ProjectDetailPage() {
 
           {/* Sidebar Area: Form */}
           <div className="space-y-8">
-            <div className="glass-card-strong rounded-[48px] p-10 border-slate-100 shadow-xl sticky top-28 bg-white/60">
+            <div className="glass-card-strong rounded-[48px] p-10 border-yellow-400/30 shadow-xl sticky top-28 bg-gradient-to-br from-white/95 to-yellow-50/60">
               <div className="flex items-center gap-4 mb-10">
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-yellow-500/20">
                   <Plus className="w-6 h-6 text-white" />

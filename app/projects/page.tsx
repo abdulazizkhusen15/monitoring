@@ -21,19 +21,29 @@ export default function ProjectsPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Soft Elegant Background */}
-      <div className="absolute inset-0 opacity-[0.5] pointer-events-none">
+      {/* Elegant Light Abstract Background */}
+      <div className="absolute inset-0 opacity-[0.6] pointer-events-none">
         <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="0" cy="0" r="400" fill="rgba(252, 211, 77, 0.1)" />
-          <circle cx="1000" cy="1000" r="400" fill="rgba(254, 243, 199, 0.1)" />
+          <defs>
+            <linearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#FDE68A" />
+              <stop offset="50%" stopColor="#FACC15" />
+              <stop offset="100%" stopColor="#CA8A04" />
+            </linearGradient>
+          </defs>
+          <g fill="url(#goldGradient)" opacity="0.15">
+            <circle cx="100" cy="100" r="300" />
+            <circle cx="900" cy="900" r="400" />
+            <path d="M400,100 Q600,300 400,500 T400,900" stroke="url(#goldGradient)" strokeWidth="2" fill="none" />
+          </g>
         </svg>
       </div>
 
       {/* Header */}
-      <header className="relative z-20 border-b border-yellow-500/10 backdrop-blur-xl bg-white/40 sticky top-0">
+      <header className="relative z-20 border-b border-yellow-500/20 backdrop-blur-xl bg-white/60 sticky top-0 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-4 group">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-yellow-500/20 group-hover:scale-110 transition-transform">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 flex items-center justify-center shadow-lg shadow-yellow-500/20 group-hover:scale-110 transition-transform">
               <span className="text-white font-black text-xl">P</span>
             </div>
             <h1 className="text-2xl font-black tracking-tight text-slate-900">PENTALAND</h1>
@@ -50,7 +60,7 @@ export default function ProjectsPage() {
                <p className="text-lg text-slate-500 font-medium">Kelola dan pantau seluruh operasional proyek Pentaland dengan efisiensi tertinggi.</p>
             </div>
             
-            <div className="glass-card-strong rounded-[40px] p-10 border-white shadow-xl">
+            <div className="glass-card-strong rounded-[40px] p-10 border-yellow-400/30 bg-gradient-to-br from-white/90 to-yellow-50/50 shadow-xl">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-8 h-8 rounded-lg bg-yellow-500 flex items-center justify-center">
                   <span className="text-black font-black text-xs">+</span>
@@ -82,7 +92,7 @@ export default function ProjectsPage() {
           </div>
 
           {/* Right Side: List */}
-          <div className="glass-card-strong rounded-[40px] p-10 border-white shadow-xl h-fit">
+          <div className="glass-card-strong rounded-[40px] p-10 border-yellow-400/30 shadow-xl h-fit bg-gradient-to-br from-white/90 to-yellow-50/50">
             <div className="flex items-center justify-between mb-10">
                 <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Daftar Aktif</h3>
                 <span className="px-3 py-1 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-black tracking-widest uppercase">{projects.length} Total</span>
@@ -99,7 +109,7 @@ export default function ProjectsPage() {
               ) : (
                 projects.map((p) => (
                   <div key={p.id} className="relative group">
-                    <div className="flex items-center justify-between p-6 bg-white/40 border border-slate-100 rounded-[32px] hover:bg-white hover:border-yellow-500/30 hover:shadow-lg transition-all group">
+                    <div className="flex items-center justify-between p-6 bg-gradient-to-br from-white/80 to-yellow-50/40 border border-yellow-200/50 rounded-[32px] hover:bg-white hover:border-yellow-500/30 hover:shadow-lg transition-all group backdrop-blur-xl">
                       <Link href={`/projects/${p.id}`} className="flex-1 cursor-pointer">
                         <h4 className="font-black text-xl text-slate-900 group-hover:text-amber-600 transition-colors">{p.name}</h4>
                         <div className="flex items-center gap-2 mt-1">
