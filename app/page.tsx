@@ -47,10 +47,11 @@ export default function Home() {
         throw error;
       }
 
-      // Small delay before redirecting
+      // Refresh and hard redirect to ensure cookies are sent
+      router.refresh();
       setTimeout(() => {
-        router.push('/dashboard');
-      }, 100);
+        window.location.href = '/dashboard';
+      }, 200);
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan autentikasi');
     } finally {
