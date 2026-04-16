@@ -3,10 +3,19 @@
 import { useState } from 'react';
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState([
-    { id: 1, name: 'Proyek A', status: true },
-    { id: 2, name: 'Proyek B', status: false },
-  ]);
+  const [projects, setProjects] = useState<{ id: number; name: string; status: boolean }[]>([]);
+  const [newProjectName, setNewProjectName] = useState('');
+
+  const addProject = () => {
+    if (!newProjectName.trim()) return;
+    const newProject = {
+      id: Date.now(),
+      name: newProjectName,
+      status: true,
+    };
+    setProjects([...projects, newProject]);
+    setNewProjectName('');
+  };
 
   const toggleStatus = (id: number) => {
     setProjects(projects.map(p => p.id === id ? { ...p, status: !p.status } : p));
@@ -41,8 +50,20 @@ export default function ProjectsPage() {
             <p className="text-lg text-slate-400">Kelola dan pantau proyek aktif Pentaland dengan presisi.</p>
             
             <div className="glass-card-strong rounded-3xl p-8 border border-slate-700/50">
-              <input type="text" placeholder="Nama Proyek Baru" className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 mb-4 focus:border-amber-500 outline-none" />
-              <button className="w-full btn-modern py-3 rounded-xl font-semibold">Tambah Proyek</button>
+              <input 
+                type="text" 
+                placeholder="Nama Proyek Baru" 
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 mb-4 focus:border-amber-500 outline-none"
+                value={newProjectName}
+                onChange={(e) => setNewProjectName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && addProject()}
+              />
+              <button 
+                onClick={addProject}
+                className="w-full btn-modern py-3 rounded-xl font-semibold"
+              >
+                Tambah Proyek
+              </button>
             </div>
           </div>
 
@@ -50,17 +71,23 @@ export default function ProjectsPage() {
           <div className="glass-card-strong rounded-3xl p-8 border border-slate-700/50">
             <h3 className="text-xl font-bold mb-6">Daftar Proyek</h3>
             <div className="space-y-4">
-              {projects.map((p) => (
-                <div key={p.id} className="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-800">
-                  <span className="font-medium">{p.name}</span>
-                  <button 
-                    onClick={() => toggleStatus(p.id)}
-                    className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase ${p.status ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}
-                  >
-                    {p.status ? 'Active' : 'Inactive'}
-                  </button>
+              {projects.length === 0 ? (
+                <div className="text-center py-8 text-slate-500 italic">
+                  Belum ada proyek. Tambahkan proyek baru di sebelah kiri.
                 </div>
-              ))}
+              ) : (
+                projects.map((p) => (
+                  <div key={p.id} className="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-800">
+                    <span className="font-medium">{p.name}</span>
+                    <button 
+                      onClick={() => toggleStatus(p.id)}
+                      className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase transition-colors ${p.status ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}
+                    >
+                      {p.status ? 'Active' : 'Inactive'}
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
