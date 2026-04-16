@@ -29,7 +29,8 @@ export default function Home() {
       // Internal mapping for authorized accounts
       const validAccounts: Record<string, string> = {
         'admin': 'admin',
-        'henny': 'heny'
+        'henny': 'heny',
+        'logistic': 'logistic'
       };
 
       const normalizedUser = username.toLowerCase();

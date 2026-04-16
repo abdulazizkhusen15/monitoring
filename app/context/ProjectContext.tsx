@@ -22,6 +22,7 @@ interface ProjectContextType {
   addProjectItem: (projectId: string, name: string, itemCode: string, unit: string) => Promise<{ success: boolean; message: string; data?: any }>;
   addTransaction: (transaction: Omit<InventoryTransaction, 'id' | 'createdAt'>) => Promise<{ success: boolean; message: string; data?: any }>;
   removeProjectItem: (projectId: string, itemId: string) => Promise<void>;
+  deleteProject: (id: string) => Promise<{ success: boolean; message: string }>;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -291,6 +292,22 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const deleteProject = async (id: string) => {
+    if (!user) return { success: false, message: 'Harus login' };
+
+    const { error } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      return { success: false, message: error.message };
+    }
+
+    setProjects(prev => prev.filter(p => p.id !== id));
+    return { success: true, message: 'Proyek berhasil dihapus' };
+  };
+
   return (
     <ProjectContext.Provider value={{
       projects,
@@ -299,7 +316,8 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       toggleProjectStatus,
       addProjectItem,
       addTransaction,
-      removeProjectItem
+      removeProjectItem,
+      deleteProject
     }}>
       {children}
     </ProjectContext.Provider>

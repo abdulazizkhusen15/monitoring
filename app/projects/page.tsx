@@ -2,12 +2,17 @@
 
 import { useState } from 'react';
 import { useProject } from '@/app/context/ProjectContext';
+import { useAuth } from '@/app/context/AuthContext';
 import Link from 'next/link';
+import { Trash2 } from 'lucide-react';
 
 export default function ProjectsPage() {
-  const { projects, loading, addProject, toggleProjectStatus } = useProject();
+  const { projects, loading, addProject, toggleProjectStatus, deleteProject } = useProject();
+  const { user } = useAuth();
   const [newProjectName, setNewProjectName] = useState('');
   const [error, setError] = useState('');
+
+  const isAdmin = user?.email === 'admin@pentaland.com';
 
   const handleAddProject = async () => {
     if (!newProjectName.trim()) return;
@@ -17,6 +22,14 @@ export default function ProjectsPage() {
       setError('');
     } else {
       setError(result.message);
+    }
+  };
+
+  const handleDeleteProject = async (id: string, name: string) => {
+    if (!isAdmin) return;
+    if (confirm(`Apakah Anda yakin ingin menghapus proyek "${name}"? Seluruh data barang dan transaksi di dalamnya akan ikut terhapus.`)) {
+      const result = await deleteProject(id);
+      if (!result.success) alert(result.message);
     }
   };
 
@@ -126,12 +139,26 @@ export default function ProjectsPage() {
                            <svg className="w-3 h-3 text-slate-300 group-hover:text-amber-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7"/></svg>
                         </div>
                       </Link>
-                      <button 
-                        onClick={() => toggleProjectStatus(p.id, p.status)}
-                        className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${p.status ? 'bg-green-500/10 text-green-600 border border-green-500/10' : 'bg-red-500/10 text-red-500 border border-red-500/10'}`}
-                      >
-                        {p.status ? 'Aktif' : 'Non-Aktif'}
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button 
+                          onClick={() => toggleProjectStatus(p.id, p.status)}
+                          className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${p.status ? 'bg-green-500/10 text-green-600 border border-green-500/10' : 'bg-red-500/10 text-red-500 border border-red-500/10'}`}
+                        >
+                          {p.status ? 'Aktif' : 'Non-Aktif'}
+                        </button>
+                        {isAdmin && (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteProject(p.id, p.name);
+                            }}
+                            className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-sm group/del"
+                            title="Hapus Proyek"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))
