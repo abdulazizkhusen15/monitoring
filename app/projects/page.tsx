@@ -1,24 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import { useProject } from '@/app/context/ProjectContext';
+import Link from 'next/link';
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState<{ id: number; name: string; status: boolean }[]>([]);
+  const { projects, addProject, toggleProjectStatus } = useProject();
   const [newProjectName, setNewProjectName] = useState('');
+  const [error, setError] = useState('');
 
-  const addProject = () => {
-    if (!newProjectName.trim()) return;
-    const newProject = {
-      id: Date.now(),
-      name: newProjectName,
-      status: true,
-    };
-    setProjects([...projects, newProject]);
-    setNewProjectName('');
-  };
-
-  const toggleStatus = (id: number) => {
-    setProjects(projects.map(p => p.id === id ? { ...p, status: !p.status } : p));
+  const handleAddProject = () => {
+    const result = addProject(newProjectName);
+    if (result.success) {
+      setNewProjectName('');
+      setError('');
+    } else {
+      setError(result.message);
+    }
   };
 
   return (
@@ -30,15 +28,15 @@ export default function ProjectsPage() {
         </svg>
       </div>
 
-      {/* Header (Same as Dashboard) */}
+      {/* Header */}
       <header className="relative z-20 border-b border-amber-500/20 backdrop-blur-md bg-gradient-to-r from-amber-500 to-amber-700">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center border border-white/30">
+          <Link href="/dashboard" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center border border-white/30 group-hover:scale-110 transition-transform">
               <span className="text-white font-bold text-lg">P</span>
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-white">PENTALAND</h1>
-          </div>
+          </Link>
         </div>
       </header>
 
@@ -53,14 +51,18 @@ export default function ProjectsPage() {
               <input 
                 type="text" 
                 placeholder="Nama Proyek Baru" 
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 mb-4 focus:border-amber-500 outline-none"
+                className={`w-full bg-slate-900 border ${error ? 'border-red-500' : 'border-slate-700'} rounded-xl px-4 py-3 mb-2 focus:border-amber-500 outline-none transition-all`}
                 value={newProjectName}
-                onChange={(e) => setNewProjectName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && addProject()}
+                onChange={(e) => {
+                  setNewProjectName(e.target.value);
+                  if (error) setError('');
+                }}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddProject()}
               />
+              {error && <p className="text-red-400 text-sm mb-4 ml-1">{error}</p>}
               <button 
-                onClick={addProject}
-                className="w-full btn-modern py-3 rounded-xl font-semibold"
+                onClick={handleAddProject}
+                className="w-full btn-modern py-3 rounded-xl font-semibold mt-2"
               >
                 Tambah Proyek
               </button>
@@ -77,11 +79,14 @@ export default function ProjectsPage() {
                 </div>
               ) : (
                 projects.map((p) => (
-                  <div key={p.id} className="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-800">
-                    <span className="font-medium">{p.name}</span>
+                  <div key={p.id} className="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-800 hover:border-amber-500/50 transition-colors group">
+                    <Link href={`/projects/${p.id}`} className="font-medium text-lg hover:text-amber-400 transition-colors flex-1 cursor-pointer">
+                      {p.name}
+                      <span className="block text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Lihat Detail →</span>
+                    </Link>
                     <button 
-                      onClick={() => toggleStatus(p.id)}
-                      className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase transition-colors ${p.status ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}
+                      onClick={() => toggleProjectStatus(p.id)}
+                      className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase transition-all ${p.status ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}
                     >
                       {p.status ? 'Active' : 'Inactive'}
                     </button>
