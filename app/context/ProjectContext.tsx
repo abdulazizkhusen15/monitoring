@@ -10,6 +10,7 @@ export interface ProjectExtended {
   name: string;
   status: boolean;
   createdAt: string;
+  pin: string | null;
   items: ProjectItem[];
   transactions: InventoryTransaction[];
 }
@@ -23,6 +24,7 @@ interface ProjectContextType {
   addTransaction: (transaction: Omit<InventoryTransaction, 'id' | 'createdAt'>) => Promise<{ success: boolean; message: string; data?: any }>;
   removeProjectItem: (projectId: string, itemId: string) => Promise<void>;
   deleteProject: (id: string) => Promise<{ success: boolean; message: string }>;
+  updateProjectPin: (id: string, pin: string | null) => Promise<{ success: boolean; message: string }>;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -61,6 +63,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
         name: p.name,
         status: p.status,
         createdAt: p.created_at,
+        pin: p.pin,
         items: (p.items || []).map((i: any) => ({
           id: i.id,
           project_id: i.project_id,
@@ -308,6 +311,20 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     return { success: true, message: 'Proyek berhasil dihapus' };
   };
 
+  const updateProjectPin = async (id: string, pin: string | null) => {
+    if (!user) return { success: false, message: 'Harus login' };
+
+    const { error } = await supabase
+      .from('projects')
+      .update({ pin })
+      .eq('id', id);
+
+    if (error) return { success: false, message: error.message };
+
+    setProjects(prev => prev.map(p => p.id === id ? { ...p, pin } : p));
+    return { success: true, message: 'PIN proyek berhasil diperbarui' };
+  };
+
   return (
     <ProjectContext.Provider value={{
       projects,
@@ -317,7 +334,8 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       addProjectItem,
       addTransaction,
       removeProjectItem,
-      deleteProject
+      deleteProject,
+      updateProjectPin
     }}>
       {children}
     </ProjectContext.Provider>

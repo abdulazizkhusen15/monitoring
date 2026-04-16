@@ -4,14 +4,21 @@ import { useState, useEffect } from 'react';
 import { useProject } from '@/app/context/ProjectContext';
 import { useAuth } from '@/app/context/AuthContext';
 import Link from 'next/link';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Lock, Unlock, Key, ShieldCheck } from 'lucide-react';
 
 export default function ProjectsPage() {
-  const { projects, loading, addProject, toggleProjectStatus, deleteProject } = useProject();
+  const { projects, loading, addProject, toggleProjectStatus, deleteProject, updateProjectPin } = useProject();
   const { user } = useAuth();
   const [newProjectName, setNewProjectName] = useState('');
   const [error, setError] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  
+  // PIN Logic States
+  const [pinModal, setPinModal] = useState<{ open: boolean; projectId: string; action: 'LOCK' | 'UNLOCK' | 'ENTER' }>({ 
+    open: false, projectId: '', action: 'ENTER' 
+  });
+  const [pinValue, setPinValue] = useState('');
+  const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
 
   useEffect(() => {
     const alias = localStorage.getItem('pentaland_user_alias');
@@ -34,6 +41,29 @@ export default function ProjectsPage() {
     if (confirm(`Apakah Anda yakin ingin menghapus proyek "${name}"? Seluruh data barang dan transaksi di dalamnya akan ikut terhapus.`)) {
       const result = await deleteProject(id);
       if (!result.success) alert(result.message);
+    }
+  };
+
+  const submitPin = async () => {
+    if (pinModal.action === 'ENTER') {
+      const project = projects.find(p => p.id === pinModal.projectId);
+      if (project?.pin === pinValue) {
+        setUnlockedIds(prev => [...prev, project.id]);
+        const targetUrl = `/projects/${project.id}`;
+        setPinModal({ open: false, projectId: '', action: 'ENTER' });
+        setPinValue('');
+        window.location.href = targetUrl;
+      } else {
+        alert('PIN Salah!');
+      }
+    } else {
+      const res = await updateProjectPin(pinModal.projectId, pinModal.action === 'LOCK' ? pinValue : null);
+      if (res.success) {
+        setPinModal({ open: false, projectId: '', action: 'ENTER' });
+        setPinValue('');
+      } else {
+        alert(res.message);
+      }
     }
   };
 
@@ -136,20 +166,46 @@ export default function ProjectsPage() {
                 projects.map((p) => (
                   <div key={p.id} className="relative group">
                     <div className="flex items-center justify-between p-6 bg-gradient-to-br from-white/80 to-yellow-50/40 border border-yellow-200/50 rounded-[32px] hover:bg-white hover:border-yellow-500/30 hover:shadow-lg transition-all group backdrop-blur-xl">
-                      <Link href={`/projects/${p.id}`} className="flex-1 cursor-pointer">
-                        <h4 className="font-black text-xl text-slate-900 group-hover:text-amber-600 transition-colors">{p.name}</h4>
-                        <div className="flex items-center gap-2 mt-1">
-                           <span className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Buka Detail Dashboard</span>
-                           <svg className="w-3 h-3 text-slate-300 group-hover:text-amber-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7"/></svg>
-                        </div>
-                      </Link>
+                      <div className="flex-1">
+                        {(!p.pin || isAdmin || unlockedIds.includes(p.id)) ? (
+                          <Link href={`/projects/${p.id}`}>
+                            <h4 className="font-black text-xl text-slate-900 group-hover:text-amber-600 transition-colors">{p.name}</h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Buka Detail Dashboard</span>
+                              <svg className="w-3 h-3 text-slate-300 group-hover:text-amber-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7"/></svg>
+                            </div>
+                          </Link>
+                        ) : (
+                          <button 
+                            onClick={() => setPinModal({ open: true, projectId: p.id, action: 'ENTER' })}
+                            className="text-left w-full group/btn"
+                          >
+                            <h4 className="font-black text-xl text-slate-400 group-hover/btn:text-amber-600 transition-colors flex items-center gap-3">
+                              {p.name} <Lock className="w-4 h-4 text-slate-300" />
+                            </h4>
+                            <p className="text-[10px] text-red-400 font-black uppercase tracking-[0.2em] mt-1 italic">Proyek Terkunci - Klik untuk masukkan PIN</p>
+                          </button>
+                        )}
+                      </div>
+
                       <div className="flex items-center gap-3">
+                        {isAdmin && (
+                          <button 
+                            onClick={() => setPinModal({ open: true, projectId: p.id, action: p.pin ? 'UNLOCK' : 'LOCK' })}
+                            className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-all ${p.pin ? 'bg-amber-50 text-amber-600 border-amber-200 shadow-sm' : 'bg-slate-50 text-slate-400 border-slate-200 opacity-40 hover:opacity-100'}`}
+                            title={p.pin ? "Ubah/Buka Kunci PIN" : "Kunci Proyek"}
+                          >
+                            {p.pin ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                          </button>
+                        )}
+                        
                         <button 
                           onClick={() => toggleProjectStatus(p.id, p.status)}
                           className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${p.status ? 'bg-green-500/10 text-green-600 border border-green-500/10' : 'bg-red-500/10 text-red-500 border border-red-500/10'}`}
                         >
                           {p.status ? 'Aktif' : 'Non-Aktif'}
                         </button>
+                        
                         {isAdmin && (
                           <button 
                             onClick={(e) => {
@@ -171,6 +227,55 @@ export default function ProjectsPage() {
           </div>
         </div>
       </main>
+
+      {/* PIN Modal */}
+      {pinModal.open && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="glass-card-strong w-full max-w-sm rounded-[48px] p-10 border-yellow-400/30 bg-white shadow-2xl scale-in-center">
+            <div className="text-center space-y-4 mb-8">
+              <div className="w-16 h-16 bg-yellow-500 rounded-3xl flex items-center justify-center mx-auto shadow-xl shadow-yellow-500/20">
+                <Key className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                  {pinModal.action === 'LOCK' ? 'Kunci Proyek' : pinModal.action === 'UNLOCK' ? 'Buka Kunci' : 'Masukkan PIN'}
+                </h3>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                  {pinModal.action === 'LOCK' ? 'Tentukan PIN 6-Digit' : 'Akses Terbatas'}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <input 
+                type="password"
+                maxLength={6}
+                placeholder="••••••"
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-center text-2xl font-black tracking-[1em] placeholder:tracking-normal placeholder:text-slate-200"
+                value={pinValue}
+                onChange={(e) => setPinValue(e.target.value)}
+                autoFocus
+                onKeyDown={(e) => e.key === 'Enter' && submitPin()}
+              />
+
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => { setPinModal({ open: false, projectId: '', action: 'ENTER' }); setPinValue(''); }}
+                  className="flex-1 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
+                >
+                  Batal
+                </button>
+                <button 
+                  onClick={submitPin}
+                  className="flex-[2] btn-modern py-4 rounded-xl shadow-lg shadow-yellow-500/20 active:scale-95 transition-transform"
+                >
+                  Konfirmasi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
