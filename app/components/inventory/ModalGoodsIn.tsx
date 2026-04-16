@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { X } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 
 const schema = z.object({
   quantity: z.number().positive('Jumlah harus lebih dari 0'),
@@ -54,7 +54,7 @@ export default function ModalGoodsIn({ isOpen, onClose, onSubmit, unit }: ModalP
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-10 space-y-8, bg-white/90">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-10 space-y-8 bg-white/90">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-3">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Tanggal</label>

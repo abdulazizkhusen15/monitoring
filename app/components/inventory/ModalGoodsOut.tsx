@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { X } from 'lucide-react';
+import { X, Send, Package } from 'lucide-react';
 
 const schema = z.object({
   quantity: z.number().positive('Jumlah harus lebih dari 0'),
@@ -18,11 +18,11 @@ interface ModalProps {
   onClose: () => void;
   onSubmit: (data: FormData) => void;
   unit: string;
-  title: string;
+  type: 'OUT' | 'USAGE';
   maxQuantity: number;
 }
 
-export default function ModalGoodsOut({ isOpen, onClose, onSubmit, unit, title, maxQuantity }: ModalProps) {
+export default function ModalGoodsOut({ isOpen, onClose, onSubmit, unit, type, maxQuantity }: ModalProps) {
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -85,7 +85,7 @@ export default function ModalGoodsOut({ isOpen, onClose, onSubmit, unit, title, 
               />
               <div className="flex items-center justify-between mt-1 px-1">
                  {errors.quantity && <p className="text-[10px] text-red-500 font-black uppercase">{errors.quantity.message}</p>}
-                 <span className="text-[9px] text-slate-400 font-black uppercase ml-auto">Tersedia: {currentStock} {unit}</span>
+                 <span className="text-[9px] text-slate-400 font-black uppercase ml-auto">Tersedia: {maxQuantity} {unit}</span>
               </div>
             </div>
           </div>

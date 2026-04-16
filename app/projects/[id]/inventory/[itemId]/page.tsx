@@ -174,7 +174,7 @@ export default function InventoryPage() {
       <ModalGoodsOut 
         isOpen={modalOutConfig.open} 
         onClose={() => setModalOutConfig({ ...modalOutConfig, open: false })}
-        title={modalOutConfig.type === 'OUT' ? 'Input Barang Keluar / Distribusi' : 'Input Pemakaian Aktual'}
+        type={modalOutConfig.type}
         maxQuantity={summary.currentStock}
         onSubmit={(data) => {
           let res;
