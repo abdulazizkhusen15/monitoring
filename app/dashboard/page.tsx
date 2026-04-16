@@ -3,13 +3,55 @@
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { useProject } from '../context/ProjectContext';
+import { useState, useEffect } from 'react';
+import { UserPlus, Trash2, ShieldCheck, Users, ArrowRight } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, signOut } = useAuth();
-  const { loading } = useProject();
+  const { loading, addLogisticUser, deleteLogisticUser, getLogisticUsers } = useProject();
   
-  const username = user?.email?.split('@')[0] || 'Admin';
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [logisticUsers, setLogisticUsers] = useState<any[]>([]);
+  const [newUser, setNewUser] = useState({ username: '', pin: '' });
+  const [actionLoading, setActionLoading] = useState(false);
+
+  useEffect(() => {
+    const alias = localStorage.getItem('pentaland_user_alias');
+    setIsAdmin(alias === 'admin');
+    if (alias === 'admin') {
+      loadLogisticUsers();
+    }
+  }, []);
+
+  const loadLogisticUsers = async () => {
+    const users = await getLogisticUsers();
+    setLogisticUsers(users);
+  };
+
+  const handleAddUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUser.username || !newUser.pin) return;
+    
+    setActionLoading(true);
+    const res = await addLogisticUser(newUser.username, newUser.pin);
+    if (res.success) {
+      setNewUser({ username: '', pin: '' });
+      await loadLogisticUsers();
+    } else {
+      alert(res.message);
+    }
+    setActionLoading(false);
+  };
+
+  const handleDeleteUser = async (id: string, username: string) => {
+    if (confirm(`Hapus akses untuk ${username}?`)) {
+      const res = await deleteLogisticUser(id);
+      if (res.success) {
+        await loadLogisticUsers();
+      }
+    }
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -24,8 +66,10 @@ export default function DashboardPage() {
     );
   }
 
+  const displayUsername = localStorage.getItem('pentaland_user_alias') || 'User';
+
   return (
-    <div className="min-h-screen relative overflow-hidden selection:bg-amber-200">
+    <div className="min-h-screen relative overflow-hidden selection:bg-amber-200 bg-[#FFFBEB]">
       {/* Elegant Light Abstract Background */}
       <div className="absolute inset-0 opacity-[0.6] pointer-events-none">
         <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -51,82 +95,158 @@ export default function DashboardPage() {
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 flex items-center justify-center shadow-lg shadow-yellow-500/30">
                 <span className="text-white font-black text-xl">P</span>
             </div>
-            <h1 className="text-2xl font-black tracking-tighter text-slate-900">PENTALAND</h1>
+            <h1 className="text-2xl font-black tracking-tighter text-slate-900 uppercase">PENTALAND</h1>
           </div>
           <button
             onClick={handleLogout}
-            className="px-6 py-2.5 text-xs font-black uppercase tracking-widest border border-yellow-500/30 hover:bg-yellow-500 hover:text-black transition-all rounded-xl text-slate-700 bg-white/80"
+            className="px-6 py-2.5 text-[10px] font-black uppercase tracking-widest border border-yellow-500/30 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all rounded-xl text-slate-700 bg-white/80 shadow-sm"
           >
-            Logout
+            Sign Out
           </button>
         </div>
       </header>
 
-      {/* Dashboard Body */}
-      <main className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-24">
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-20 space-y-20">
+        {/* Welcome Section */}
         <div className="grid lg:grid-cols-2 gap-20 items-center">
           <div className="space-y-10">
             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-yellow-400/20 border border-yellow-500/30 text-[10px] text-amber-700 tracking-[0.2em] font-black uppercase">
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-              Admin Control Panel
+              {isAdmin ? 'System Administrator' : 'Operator Logistik'}
             </div>
-            <h2 className="text-7xl font-black tracking-tighter leading-[0.9] text-slate-900">
-              Welcome back, <br/>
-              <span className="text-gold-gradient drop-shadow-sm">{username}</span>
+            <h2 className="text-7xl font-black tracking-tighter leading-[0.9] text-slate-900 uppercase">
+              Welcome, <br/>
+              <span className="text-gold-gradient drop-shadow-sm">{displayUsername}</span>
             </h2>
-            <p className="text-lg text-slate-600 max-w-lg leading-relaxed font-bold opacity-80">
-              Pantau dan kelola seluruh operasional logistik proyek dengan sistem kendali terpusat yang presisi dan elegan.
+            <p className="text-lg text-slate-600 max-w-lg leading-relaxed font-bold opacity-80 uppercase tracking-tight">
+              Akses panel kendali proyek Pentaland. Pantau stok, distribusi, dan aktivitas logistik secara real-time.
             </p>
             <div className="flex items-center gap-6 pt-4">
               <button 
                 onClick={() => router.push('/projects')}
-                className="btn-modern px-10 py-5 rounded-2xl font-black text-black shadow-2xl flex items-center gap-4 hover:scale-105 active:scale-95 transition-all"
+                className="btn-modern px-10 py-5 rounded-2xl font-black text-black shadow-2xl flex items-center gap-4 hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-xs"
               >
                 Monitoring Proyek
-                <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
+                <ArrowRight className="w-5 h-5" />
               </button>
             </div>
           </div>
 
           <div className="relative group">
-            {/* Box dengan gradasi kuning-emas */}
-            <div className="glass-card-strong rounded-[48px] p-10 border-yellow-400/30 shadow-[0_32px_64px_-16px_rgba(212,163,11,0.15)] transition-all hover:shadow-[0_48px_80px_-20px_rgba(212,163,11,0.2)] relative z-10 overflow-hidden bg-gradient-to-br from-white/80 via-yellow-50/50 to-yellow-100/40">
-               {/* Decorative background for the card */}
-               <div className="absolute top-0 right-0 w-48 h-48 bg-yellow-400/10 blur-3xl rounded-full -mr-24 -mt-24"></div>
-               <div className="absolute bottom-0 left-0 w-32 h-32 bg-amber-400/5 blur-2xl rounded-full -ml-16 -mb-16"></div>
-               
-              <div className="flex items-center justify-between mb-12 relative z-10">
-                <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center text-white shadow-lg shadow-yellow-500/20">
-                    <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                </div>
-                <div className="text-right">
-                    <div className="text-[10px] text-slate-500 uppercase tracking-[0.2em] font-black mb-1">Status Proyek</div>
-                    <div className="text-xs text-amber-700 font-black bg-yellow-400/20 px-3 py-1 rounded-lg uppercase tracking-widest border border-yellow-500/20">Operational</div>
-                </div>
-              </div>
-              
-              <div className="space-y-6 relative z-10">
-                {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-20 rounded-3xl border border-yellow-200/50 flex items-center px-6 gap-6 bg-white/60 hover:bg-yellow-100/50 hover:border-yellow-400 transition-all cursor-default group/item shadow-sm">
-                        <div className="w-10 h-10 rounded-2xl bg-yellow-50 group-hover/item:bg-white transition-colors flex items-center justify-center">
-                           <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
-                        </div>
-                        <div className="flex-1 space-y-3">
-                            <div className="h-2.5 w-32 bg-yellow-200/50 rounded-full group-hover/item:bg-yellow-300/50 transition-colors"></div>
-                            <div className="h-2 w-20 bg-yellow-50 rounded-full"></div>
-                        </div>
-                    </div>
-                ))}
-              </div>
+            <div className="glass-card-strong rounded-[48px] p-10 border-yellow-400/30 shadow-2xl bg-gradient-to-br from-white/90 to-yellow-50/50">
+               <ShieldCheck className="w-20 h-20 text-yellow-500 mb-8 opacity-20" />
+               <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-4">Ringkasan Sistem</h3>
+               <p className="text-sm text-slate-500 font-bold uppercase tracking-widest leading-loose">
+                 Semua data tersinkronisasi dengan server cloud Pentaland. Pastikan setiap input barang keluar & masuk dicatat dengan teliti.
+               </p>
             </div>
-            
-            {/* Soft decorative glow behind the card */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-yellow-300 to-amber-500 rounded-[60px] opacity-10 blur-3xl -z-10 group-hover:opacity-30 transition-opacity"></div>
+            <div className="absolute -inset-4 bg-yellow-500/10 blur-3xl -z-10 rounded-[60px]"></div>
           </div>
         </div>
+
+        {/* Admin Only: Team Management */}
+        {isAdmin && (
+          <div className="space-y-12 animate-in slide-in-from-bottom-10 duration-700">
+            <div className="flex items-center gap-6">
+              <div className="w-14 h-14 rounded-3xl bg-slate-900 flex items-center justify-center text-white shadow-xl shadow-slate-900/20">
+                <Users className="w-7 h-7" />
+              </div>
+              <div>
+                <h3 className="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none mb-2">Kelola Tim Logistic</h3>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Hanya Admin yang dapat menambah & menghapus akses</p>
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-12">
+              {/* Form Add User */}
+              <div className="lg:col-span-1">
+                <div className="glass-card-strong p-8 rounded-[40px] border-slate-100 bg-white shadow-xl space-y-8">
+                  <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                    <UserPlus className="w-4 h-4 text-blue-500" />
+                    Tambah Akun Baru
+                  </h4>
+                  <form onSubmit={handleAddUser} className="space-y-6">
+                    <div>
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1">Username</label>
+                      <input 
+                        type="text" 
+                        placeholder="Contoh: staff_logistic"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold"
+                        value={newUser.username}
+                        onChange={e => setNewUser({...newUser, username: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1">PIN Keamanan</label>
+                      <input 
+                        type="password" 
+                        placeholder="••••••"
+                        maxLength={6}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-bold text-center tracking-[0.5em]"
+                        value={newUser.pin}
+                        onChange={e => setNewUser({...newUser, pin: e.target.value})}
+                      />
+                    </div>
+                    <button 
+                      disabled={actionLoading}
+                      className="w-full py-5 rounded-2xl bg-slate-900 text-white font-black uppercase tracking-widest text-[10px] shadow-xl shadow-slate-900/20 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                    >
+                      {actionLoading ? 'Memproses...' : (
+                        <>
+                          <UserPlus className="w-4 h-4" />
+                          Daftarkan Akses
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              {/* List Users */}
+              <div className="lg:col-span-2">
+                <div className="glass-card-strong p-8 rounded-[40px] border-slate-100 bg-white/60 shadow-xl overflow-hidden min-h-[400px]">
+                  <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest mb-8 flex items-center gap-2">
+                    <Users className="w-4 h-4 text-amber-500" />
+                    Daftar Akses Terdaftar
+                  </h4>
+                  
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {logisticUsers.length === 0 ? (
+                      <div className="col-span-full py-20 text-center opacity-40">
+                        <p className="text-[10px] font-black uppercase tracking-widest">Belum ada akun logistic tambahan</p>
+                      </div>
+                    ) : (
+                      logisticUsers.map(u => (
+                        <div key={u.id} className="flex items-center justify-between p-6 rounded-[32px] border border-slate-100 bg-white/80 group hover:border-red-200 transition-all">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center">
+                              <span className="text-[10px] font-black uppercase">{u.username[0]}</span>
+                            </div>
+                            <div>
+                              <p className="text-sm font-black text-slate-900 uppercase tracking-tight">{u.username}</p>
+                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Role: Logistic</p>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => handleDeleteUser(u.id, u.username)}
+                            className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 border border-red-100 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
+
+      <footer className="relative z-10 py-10 text-center opacity-40">
+         <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500">&copy; 2026 Pentaland Monitoring. Precision Control.</p>
+      </footer>
     </div>
   );
 }

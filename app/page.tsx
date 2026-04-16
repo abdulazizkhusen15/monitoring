@@ -26,15 +26,35 @@ export default function Home() {
     setLoading(true);
 
     try {
-      // Internal mapping for authorized accounts
-      const validAccounts: Record<string, string> = {
+      // Internal mapping for hardcoded authorized accounts
+      const staticAccounts: Record<string, string> = {
         'admin': 'admin',
         'henny': 'heny',
         'ko awi': 'ko awi'
       };
 
-      const normalizedUser = username.toLowerCase();
-      if (!validAccounts[normalizedUser] || validAccounts[normalizedUser] !== password) {
+      const normalizedUser = username.toLowerCase().trim();
+      let isValid = false;
+
+      // 1. Check Static Accounts
+      if (staticAccounts[normalizedUser] && staticAccounts[normalizedUser] === password) {
+        isValid = true;
+      } 
+      // 2. Check Dynamic Logistic Users from Database
+      else {
+        const { data: logUser, error: logError } = await supabase
+          .from('logistic_users')
+          .select('*')
+          .eq('username', normalizedUser)
+          .eq('password', password)
+          .single();
+        
+        if (logUser && !logError) {
+          isValid = true;
+        }
+      }
+
+      if (!isValid) {
         throw new Error('Username atau password salah');
       }
 

@@ -25,6 +25,9 @@ interface ProjectContextType {
   removeProjectItem: (projectId: string, itemId: string) => Promise<void>;
   deleteProject: (id: string) => Promise<{ success: boolean; message: string }>;
   updateProjectPin: (id: string, pin: string | null) => Promise<{ success: boolean; message: string }>;
+  addLogisticUser: (username: string, pin: string) => Promise<{ success: boolean; message: string }>;
+  deleteLogisticUser: (id: string) => Promise<{ success: boolean; message: string }>;
+  getLogisticUsers: () => Promise<any[]>;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -326,6 +329,27 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     return { success: true, message: 'PIN proyek berhasil diperbarui' };
   };
 
+  const addLogisticUser = async (username: string, pin: string) => {
+    const { error } = await supabase
+      .from('logistic_users')
+      .insert({ username: username.toLowerCase().trim(), password: pin });
+    
+    if (error) return { success: false, message: error.code === '23505' ? 'Username sudah digunakan' : error.message };
+    return { success: true, message: 'Pengguna Logistic berhasil ditambahkan' };
+  };
+
+  const deleteLogisticUser = async (id: string) => {
+    const { error } = await supabase.from('logistic_users').delete().eq('id', id);
+    if (error) return { success: false, message: error.message };
+    return { success: true, message: 'Pengguna berhasil dihapus' };
+  };
+
+  const getLogisticUsers = async () => {
+    const { data, error } = await supabase.from('logistic_users').select('*').order('created_at', { ascending: false });
+    if (error) return [];
+    return data;
+  };
+
   return (
     <ProjectContext.Provider value={{
       projects,
@@ -336,7 +360,10 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       addTransaction,
       removeProjectItem,
       deleteProject,
-      updateProjectPin
+      updateProjectPin,
+      addLogisticUser,
+      deleteLogisticUser,
+      getLogisticUsers
     }}>
       {children}
     </ProjectContext.Provider>
