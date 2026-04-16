@@ -30,7 +30,7 @@ export default function Home() {
       const validAccounts: Record<string, string> = {
         'admin': 'admin',
         'henny': 'heny',
-        'logistic': 'logistic'
+        'ko awi': 'ko awi'
       };
 
       const normalizedUser = username.toLowerCase();
