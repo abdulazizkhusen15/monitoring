@@ -26,12 +26,18 @@ export default function Home() {
     setLoading(true);
 
     try {
-      // Internal mapping for admin/admin
-      if (username.toLowerCase() !== 'admin' || password !== 'admin') {
+      // Internal mapping for authorized accounts
+      const validAccounts: Record<string, string> = {
+        'admin': 'admin',
+        'henny': 'heny'
+      };
+
+      const normalizedUser = username.toLowerCase();
+      if (!validAccounts[normalizedUser] || validAccounts[normalizedUser] !== password) {
         throw new Error('Username atau password salah');
       }
 
-      // We use a fixed internal email for the single admin account
+      // We use a fixed internal email for all admin accounts to share the same data
       const adminEmail = 'admin@pentaland.com';
       const adminPassword = 'admin_pentaland_secure_123'; // Internal password for Supabase Auth
 
