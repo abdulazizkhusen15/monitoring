@@ -6,6 +6,7 @@ create table if not exists projects (
   user_id uuid references auth.users not null,
   name text not null,
   status boolean default true,
+  pin text,
   created_at timestamptz default now(),
   unique(user_id, name)
 );
