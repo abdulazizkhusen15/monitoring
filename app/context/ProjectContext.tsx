@@ -117,7 +117,8 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
           if (lp.transactions.length > 0) {
              const transactionsToInsert = lp.transactions.map(t => {
                 // Find matching new item ID by item_code
-                const matchedItem = newItems.find(ni => ni.item_code === t.itemCode);
+                const oldItem = lp.items.find(i => i.id === t.itemId);
+                const matchedItem = newItems.find(ni => ni.item_code === oldItem?.itemCode);
                 return {
                   project_id: newProj.id,
                   item_id: matchedItem?.id,
