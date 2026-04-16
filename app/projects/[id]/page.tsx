@@ -4,7 +4,7 @@ import { useProject } from '@/app/context/ProjectContext';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Link from 'next/link';
-import { VALID_UNITS } from '@/app/types/inventory';
+import { VALID_UNITS, Unit } from '@/app/types/inventory';
 import { Package, Plus, ChevronRight, Settings } from 'lucide-react';
 
 export default function ProjectDetailPage() {
@@ -16,7 +16,7 @@ export default function ProjectDetailPage() {
   
   const [itemName, setItemName] = useState('');
   const [itemCode, setItemCode] = useState('');
-  const [unit, setUnit] = useState(VALID_UNITS[0]);
+  const [unit, setUnit] = useState<Unit>(VALID_UNITS[0]);
   const [error, setError] = useState('');
 
   if (!project) {
@@ -164,7 +164,7 @@ export default function ProjectDetailPage() {
                     <select 
                       className="w-full bg-slate-900 border border-slate-800 rounded-2xl px-5 py-4 focus:border-amber-500 outline-none transition-all text-white font-medium appearance-none"
                       value={unit}
-                      onChange={(e) => setUnit(e.target.value)}
+                      onChange={(e) => setUnit(e.target.value as Unit)}
                     >
                       {VALID_UNITS.map(u => (
                         <option key={u} value={u}>{u.toUpperCase()}</option>
