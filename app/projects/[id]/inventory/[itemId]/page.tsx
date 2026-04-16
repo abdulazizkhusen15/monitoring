@@ -28,6 +28,25 @@ export default function InventoryPage() {
   const [isModalInOpen, setIsModalInOpen] = useState(false);
   const [modalOutConfig, setModalOutConfig] = useState<{ open: boolean, type: 'OUT' | 'USAGE' }>({ open: false, type: 'OUT' });
 
+  if (!project || !item) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 text-center">
+        <div className="glass-card-strong p-12 rounded-[48px] border-yellow-400/30 bg-gradient-to-br from-white/95 to-yellow-50/60 shadow-2xl max-w-md">
+          <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-6" />
+          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-4">Data Tidak Ditemukan</h1>
+          <p className="text-sm text-slate-500 font-bold uppercase tracking-widest mb-8">Informasi proyek atau item logistik tidak tersedia atau telah dihapus.</p>
+          <button 
+            onClick={() => router.back()} 
+            className="btn-modern px-10 py-5 rounded-2xl w-full flex items-center justify-center gap-3"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Kembali
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden pb-20">
       {/* Elegant Light Abstract Background */}
