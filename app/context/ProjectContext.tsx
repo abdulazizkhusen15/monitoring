@@ -60,8 +60,25 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
         name: p.name,
         status: p.status,
         createdAt: p.created_at,
-        items: p.items || [],
-        transactions: p.transactions || []
+        items: (p.items || []).map((i: any) => ({
+          id: i.id,
+          project_id: i.project_id,
+          name: i.name,
+          itemCode: i.item_code,
+          unit: i.unit,
+          isCompleted: i.is_completed,
+          createdAt: i.created_at
+        })),
+        transactions: (p.transactions || []).map((t: any) => ({
+          id: t.id,
+          projectId: t.project_id,
+          itemId: t.item_id,
+          type: t.type,
+          quantity: t.quantity,
+          date: t.date,
+          notes: t.notes,
+          createdAt: t.created_at
+        }))
       }));
 
       setProjects(mapped);
