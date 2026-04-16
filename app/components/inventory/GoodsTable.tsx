@@ -39,19 +39,22 @@ export default function GoodsTable({ transactions, unit }: GoodsTableProps) {
   );
 
   return (
-    <div className="glass-card-strong rounded-3xl overflow-hidden border border-white/5">
-      <div className="p-6 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/5">
-        <h3 className="text-xl font-bold text-white flex items-center gap-2">
-          Riwayat Pergerakan
-          <span className="text-xs font-medium text-slate-500 bg-slate-800 px-2 py-1 rounded-md">{filtered.length} Data</span>
-        </h3>
+    <div className="glass-card-strong rounded-[48px] overflow-hidden border-slate-100 shadow-xl bg-white/60">
+      <div className="p-10 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-8 bg-white/40">
+        <div className="space-y-1">
+          <h3 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+            Riwayat Pergerakan
+            <span className="text-[10px] font-black text-amber-600 bg-amber-500/10 px-3 py-1 rounded-lg uppercase tracking-widest border border-amber-500/10">{filtered.length} Data</span>
+          </h3>
+          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Logging pergerakan logistik aktual</p>
+        </div>
         
-        <div className="flex bg-slate-900 p-1 rounded-xl border border-white/5">
+        <div className="flex bg-slate-50 p-1.5 rounded-2xl border border-slate-100 shadow-inner">
           {(['ALL', 'IN', 'OUT', 'USAGE'] as const).map((t) => (
             <button
               key={t}
               onClick={() => setFilter(t)}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${filter === t ? 'bg-amber-500 text-black' : 'text-slate-500 hover:text-white'}`}
+              className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === t ? 'bg-yellow-500 text-black shadow-lg shadow-yellow-500/20' : 'text-slate-400 hover:text-slate-600'}`}
             >
               {t === 'ALL' ? 'Semua' : t === 'IN' ? 'Masuk' : t === 'OUT' ? 'Keluar' : 'Pakai'}
             </button>
@@ -62,42 +65,46 @@ export default function GoodsTable({ transactions, unit }: GoodsTableProps) {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-900/50">
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Tanggal</th>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Tipe</th>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">Jumlah</th>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Keterangan</th>
+            <tr className="bg-slate-50/50">
+              <th className="px-10 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Tanggal Transaksi</th>
+              <th className="px-10 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Klasifikasi</th>
+              <th className="px-10 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">Kuantitas</th>
+              <th className="px-10 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Keterangan</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-slate-100">
             {sortedTransactions.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-6 py-12 text-center text-slate-500 italic text-sm">
+                <td colSpan={4} className="px-10 py-24 text-center text-slate-300 font-bold uppercase tracking-widest text-[10px] bg-white/20">
+                  <Package className="w-10 h-10 mx-auto mb-4 opacity-20" />
                   Tidak ada data transaksi ditemukan.
                 </td>
               </tr>
             ) : (
               sortedTransactions.map((t) => (
-                <tr key={t.id} className="hover:bg-white/5 transition-colors group">
-                  <td className="px-6 py-5">
-                    <div className="text-sm font-medium text-white">
-                      {new Date(t.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                <tr key={t.id} className="hover:bg-yellow-50/50 transition-colors group cursor-default">
+                  <td className="px-10 py-7">
+                    <div className="text-sm font-black text-slate-900 mb-0.5">
+                      {new Date(t.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </div>
-                    <div className="text-[10px] text-slate-500 font-bold">PADA {new Date(t.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div className="text-[9px] text-slate-400 font-black uppercase tracking-widest flex items-center gap-2">
+                       <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
+                       DIINPUT JAM {new Date(t.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                    </div>
                   </td>
-                  <td className="px-6 py-5">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${getBadgeStyle(t.type)}`}>
+                  <td className="px-10 py-7">
+                    <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all ${getBadgeStyle(t.type)}`}>
                       {getTypeName(t.type)}
                     </span>
                   </td>
-                  <td className="px-6 py-5 text-right">
-                    <div className="text-base font-black text-white">
+                  <td className="px-10 py-7 text-right">
+                    <div className={`text-xl font-black ${t.type === 'IN' ? 'text-blue-600' : 'text-slate-900'} tracking-tight`}>
                       {t.type === 'IN' ? '+' : '-'}{t.quantity}
                     </div>
-                    <div className="text-[10px] text-slate-500 font-bold">{unit}</div>
+                    <div className="text-[9px] text-slate-400 font-black uppercase tracking-widest">{unit}</div>
                   </td>
-                  <td className="px-6 py-5">
-                    <p className="text-sm text-slate-400 max-w-[200px] truncate md:max-w-xs" title={t.notes}>
+                  <td className="px-10 py-7">
+                    <p className="text-sm font-medium text-slate-500 max-w-[200px] truncate md:max-w-xs transition-colors group-hover:text-slate-900" title={t.notes}>
                       {t.notes || '-'}
                     </p>
                   </td>

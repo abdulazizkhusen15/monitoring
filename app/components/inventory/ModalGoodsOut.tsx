@@ -43,60 +43,79 @@ export default function ModalGoodsOut({ isOpen, onClose, onSubmit, unit, title, 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
-      <div className="relative w-full max-w-md bg-[#0F172A] border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/5">
-          <h3 className="text-xl font-bold text-white">{title}</h3>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-white transition-colors">
-            <X className="w-5 h-5" />
-          </button>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+      <div 
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-md transition-opacity"
+        onClick={onClose}
+      />
+      
+      <div className="relative w-full max-w-xl glass-card-strong rounded-[48px] overflow-hidden border-white shadow-2xl animate-in fade-in zoom-in duration-300">
+        <div className={`p-10 text-white relative overflow-hidden ${type === 'OUT' ? 'bg-gradient-to-br from-purple-500 to-purple-700' : 'bg-gradient-to-br from-amber-400 to-amber-600'}`}>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-2xl rounded-full -mr-16 -mt-16"></div>
+          <div className="relative z-10">
+            <h3 className="text-3xl font-black uppercase tracking-tight mb-2">
+              {type === 'OUT' ? 'Distribusi Keluar' : 'Catat Pemakaian'}
+            </h3>
+            <p className="text-white/80 text-xs font-black uppercase tracking-widest flex items-center gap-2">
+              {type === 'OUT' ? <Send className="w-4 h-4" /> : <Package className="w-4 h-4" />} 
+              {type === 'OUT' ? 'Distribusi Barang ke Proyek Lain' : 'Pemakaian Aktif di Proyek Saat Ini'}
+            </p>
+          </div>
         </div>
-        
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-4">
-          <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl mb-4">
-            <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1">Stok Tersedia</p>
-            <p className="text-xl font-black text-white">{maxQuantity} <span className="text-xs">{unit}</span></p>
+
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-10 space-y-8 bg-white/90">
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Tanggal Transaksi</label>
+              <input
+                type="date"
+                {...register('date')}
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold"
+              />
+              {errors.date && <p className="text-[10px] text-red-500 font-black uppercase ml-1">{errors.date.message}</p>}
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Kuantitas ({unit})</label>
+              <input
+                type="number"
+                step="0.01"
+                {...register('quantity', { valueAsNumber: true })}
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold"
+              />
+              <div className="flex items-center justify-between mt-1 px-1">
+                 {errors.quantity && <p className="text-[10px] text-red-500 font-black uppercase">{errors.quantity.message}</p>}
+                 <span className="text-[9px] text-slate-400 font-black uppercase ml-auto">Tersedia: {currentStock} {unit}</span>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="text-xs font-black uppercase tracking-widest text-slate-500 block mb-2">Jumlah / Kuantitas ({unit})</label>
-            <input
-              type="number"
-              step="any"
-              max={maxQuantity}
-              className={`w-full bg-slate-900 border ${errors.quantity ? 'border-red-500' : 'border-slate-800'} rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-all`}
-              {...register('quantity', { valueAsNumber: true })}
-            />
-            {errors.quantity && <p className="text-red-400 text-[10px] mt-1 font-bold">{errors.quantity.message}</p>}
-          </div>
-
-          <div>
-            <label className="text-xs font-black uppercase tracking-widest text-slate-500 block mb-2">Tanggal Transaksi</label>
-            <input
-              type="date"
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-all"
-              {...register('date')}
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-black uppercase tracking-widest text-slate-500 block mb-2">Keterangan / Tujuan</label>
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Catatan / Lokasi Penggunaan</label>
             <textarea
-              placeholder="Contoh: Distribusi ke Proyek B atau Pemakaian di Sektor A"
-              rows={3}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-all resize-none text-sm"
               {...register('notes')}
-            ></textarea>
+              placeholder={type === 'OUT' ? "Contoh: Kirim ke Proyek Tower B..." : "Contoh: Pengecoran lantai 2..."}
+              rows={3}
+              className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold resize-none"
+            />
           </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-4 bg-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-xs rounded-xl transition-all border border-white/10 mt-4"
-          >
-            {isSubmitting ? 'Menyimpan...' : 'Simpan Transaksi'}
-          </button>
+          <div className="flex gap-4 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 border border-slate-100 hover:bg-slate-50 transition-all active:scale-95"
+            >
+              Batalkan
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`flex-2 px-12 py-5 rounded-2xl shadow-xl active:scale-95 transition-transform text-white font-black uppercase tracking-widest text-xs ${type === 'OUT' ? 'bg-purple-600 shadow-purple-500/20' : 'bg-yellow-500 shadow-yellow-500/20'}`}
+            >
+              {isSubmitting ? 'Memproses...' : 'Simpan Transaksi'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

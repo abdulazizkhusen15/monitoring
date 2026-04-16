@@ -45,18 +45,18 @@ export default function SummaryCards({ summary, unit }: SummaryCardsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
       {cards.map((card, idx) => (
-        <div key={idx} className={`glass-card-strong p-6 rounded-3xl border ${card.borderColor} transition-all hover:scale-[1.02]`}>
-          <div className="flex items-start justify-between mb-4">
-            <div className={`p-2 rounded-xl ${card.bgColor}`}>
-              <card.icon className={`w-5 h-5 ${card.color}`} />
+        <div key={idx} className={`glass-card-strong p-8 rounded-[40px] border ${card.borderColor} bg-white/60 transition-all hover:scale-[1.05] hover:shadow-2xl hover:shadow-slate-200/50 group`}>
+          <div className="flex items-start justify-between mb-6">
+            <div className={`p-4 rounded-[20px] ${card.bgColor} shadow-sm group-hover:scale-110 transition-transform`}>
+              <card.icon className={`w-6 h-6 ${card.color}`} />
             </div>
           </div>
-          <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">{card.title}</p>
+          <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mb-2">{card.title}</p>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-white">{card.value}</span>
-            <span className="text-xs font-bold text-slate-500 uppercase">{unit}</span>
+            <span className="text-4xl font-black text-slate-900 tracking-tighter">{card.value}</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{unit}</span>
           </div>
         </div>
       ))}

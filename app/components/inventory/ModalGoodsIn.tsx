@@ -37,54 +37,73 @@ export default function ModalGoodsIn({ isOpen, onClose, onSubmit, unit }: ModalP
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
-      <div className="relative w-full max-w-md bg-[#0F172A] border border-white/10 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/5">
-          <h3 className="text-xl font-bold text-white">Input Barang Masuk</h3>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-white transition-colors">
-            <X className="w-5 h-5" />
-          </button>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+      <div 
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-md transition-opacity"
+        onClick={onClose}
+      />
+      
+      <div className="relative w-full max-w-xl glass-card-strong rounded-[48px] overflow-hidden border-white shadow-2xl animate-in fade-in zoom-in duration-300">
+        <div className="bg-gradient-to-br from-yellow-400 to-yellow-600 p-10 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-2xl rounded-full -mr-16 -mt-16"></div>
+          <div className="relative z-10">
+            <h3 className="text-3xl font-black uppercase tracking-tight mb-2">Tambah Stok</h3>
+            <p className="text-white/80 text-xs font-black uppercase tracking-widest flex items-center gap-2">
+              <Plus className="w-4 h-4" /> Masukkan Data Barang Masuk
+            </p>
+          </div>
         </div>
-        
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-4">
-          <div>
-            <label className="text-xs font-black uppercase tracking-widest text-slate-500 block mb-2">Jumlah / Kuantitas ({unit})</label>
-            <input
-              type="number"
-              step="any"
-              className={`w-full bg-slate-900 border ${errors.quantity ? 'border-red-500' : 'border-slate-800'} rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-all`}
-              {...register('quantity', { valueAsNumber: true })}
-            />
-            {errors.quantity && <p className="text-red-400 text-[10px] mt-1 font-bold">{errors.quantity.message}</p>}
+
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-10 space-y-8, bg-white/90">
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Tanggal</label>
+              <input
+                type="date"
+                {...register('date')}
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold"
+              />
+              {errors.date && <p className="text-[10px] text-red-500 font-black uppercase ml-1">{errors.date.message}</p>}
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Kuantitas ({unit})</label>
+              <input
+                type="number"
+                step="0.01"
+                {...register('quantity', { valueAsNumber: true })}
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold"
+              />
+              {errors.quantity && <p className="text-[10px] text-red-500 font-black uppercase ml-1">{errors.quantity.message}</p>}
+            </div>
           </div>
 
-          <div>
-            <label className="text-xs font-black uppercase tracking-widest text-slate-500 block mb-2">Tanggal Masuk</label>
-            <input
-              type="date"
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-all"
-              {...register('date')}
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-black uppercase tracking-widest text-slate-500 block mb-2">Keterangan / Supplier</label>
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Catatan / Keterangan</label>
             <textarea
-              placeholder="Contoh: Pengiriman dari Gudang Pusat"
-              rows={3}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-amber-500 outline-none transition-all resize-none text-sm"
               {...register('notes')}
-            ></textarea>
+              placeholder="Contoh: Pengiriman dari Supplier Utama..."
+              rows={3}
+              className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold resize-none"
+            />
           </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-4 bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 text-black font-black uppercase tracking-widest text-xs rounded-xl transition-all shadow-lg shadow-amber-500/20 mt-4"
-          >
-            {isSubmitting ? 'Menyimpan...' : 'Simpan Barang Masuk'}
-          </button>
+          <div className="flex gap-4 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 border border-slate-100 hover:bg-slate-50 transition-all active:scale-95"
+            >
+              Batalkan
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-2 btn-modern px-12 py-5 rounded-2xl shadow-xl shadow-yellow-500/20 active:scale-95 transition-transform bg-yellow-500 text-white font-black uppercase tracking-widest text-xs"
+            >
+              {isSubmitting ? 'Menyimpan...' : 'Simpan Data'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

@@ -25,43 +25,37 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0F1A] text-slate-100 relative overflow-hidden">
-      {/* Dynamic Building Vector Background */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+    <div className="min-h-screen relative overflow-hidden selection:bg-amber-200">
+      {/* Elegant Light Abstract Background */}
+      <div className="absolute inset-0 opacity-[0.4] pointer-events-none">
         <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#FACC15" />
+              <stop offset="0%" stopColor="#FDE68A" />
+              <stop offset="50%" stopColor="#FACC15" />
               <stop offset="100%" stopColor="#CA8A04" />
             </linearGradient>
           </defs>
-          {/* Dense Cityscape Pattern */}
-          <g fill="url(#goldGradient)">
-            <rect x="50" y="400" width="80" height="600" rx="4" />
-            <rect x="150" y="300" width="100" height="700" rx="4" />
-            <rect x="270" y="500" width="70" height="500" rx="4" />
-            <rect x="360" y="200" width="120" height="800" rx="4" />
-            <rect x="500" y="450" width="90" height="550" rx="4" />
-            <rect x="610" y="250" width="110" height="750" rx="4" />
-            <rect x="740" y="550" width="80" height="450" rx="4" />
-            <rect x="840" y="350" width="100" height="650" rx="4" />
-            <rect x="900" y="100" width="60" height="900" rx="4" />
+          <g fill="url(#goldGradient)" opacity="0.1">
+            <circle cx="100" cy="100" r="200" />
+            <circle cx="900" cy="900" r="300" />
+            <rect x="400" y="400" width="200" height="200" transform="rotate(45 500 500)" />
           </g>
         </svg>
       </div>
 
       {/* Navigation Header */}
-      <header className="relative z-20 border-b border-slate-800/60 backdrop-blur-md bg-[#0A0F1A]/50">
+      <header className="relative z-20 border-b border-yellow-500/10 backdrop-blur-xl bg-white/40 sticky top-0">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-                <span className="text-amber-500 font-bold text-lg">P</span>
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-yellow-500/20">
+                <span className="text-white font-black text-xl">P</span>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">PENTALAND</h1>
+            <h1 className="text-2xl font-black tracking-tighter text-slate-900">PENTALAND</h1>
           </div>
           <button
             onClick={handleLogout}
-            className="px-5 py-2.5 text-sm font-medium border border-slate-700 hover:border-amber-500/50 hover:bg-slate-800 transition-all rounded-lg text-slate-300"
+            className="px-6 py-2.5 text-xs font-black uppercase tracking-widest border border-yellow-500/20 hover:bg-yellow-500 hover:text-black transition-all rounded-xl text-slate-600 bg-white/50"
           >
             Logout
           </button>
@@ -69,58 +63,67 @@ export default function Dashboard() {
       </header>
 
       {/* Dashboard Body */}
-      <main className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-20">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs text-amber-500 tracking-wider font-semibold uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-24">
+        <div className="grid lg:grid-cols-2 gap-20 items-center">
+          <div className="space-y-10">
+            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-[10px] text-amber-600 tracking-[0.2em] font-black uppercase">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
               Admin Control Panel
             </div>
-            <h2 className="text-6xl font-extrabold tracking-tighter leading-[1.1]">
+            <h2 className="text-7xl font-black tracking-tighter leading-[0.9] text-slate-900">
               Welcome back, <br/>
-              <span className="text-gold-gradient">{username}</span>
+              <span className="text-gold-gradient drop-shadow-sm">{username}</span>
             </h2>
-            <p className="text-lg text-slate-400 max-w-lg leading-relaxed">
-              Pantau dan kelola seluruh operasional logistik proyek dengan sistem kendali terpusat yang presisi.
+            <p className="text-lg text-slate-500 max-w-lg leading-relaxed font-medium">
+              Pantau dan kelola seluruh operasional logistik proyek dengan sistem kendali terpusat yang presisi dan elegan.
             </p>
-            <button 
-              onClick={() => router.push('/projects')}
-              className="btn-modern px-8 py-4 rounded-xl font-semibold text-white shadow-lg flex items-center gap-3"
-            >
-              Monitoring Proyek
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </button>
+            <div className="flex items-center gap-6 pt-4">
+              <button 
+                onClick={() => router.push('/projects')}
+                className="btn-modern px-10 py-5 rounded-2xl font-black text-black shadow-2xl flex items-center gap-4 hover:scale-105 active:scale-95 transition-all"
+              >
+                Monitoring Proyek
+                <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            </div>
           </div>
 
-          <div className="relative group perspective">
-            <div className="glass-card-strong rounded-3xl p-8 border-slate-700/50 shadow-2xl">
-              <div className="flex items-center justify-between mb-10">
-                <div className="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-500">
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <div className="relative group">
+            <div className="glass-card-strong rounded-[48px] p-10 border-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] transition-all hover:shadow-[0_48px_80px_-20px_rgba(0,0,0,0.15)] relative z-10 overflow-hidden">
+               {/* Decorative background for the card */}
+               <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 blur-3xl rounded-full -mr-16 -mt-16"></div>
+               
+              <div className="flex items-center justify-between mb-12">
+                <div className="w-16 h-16 rounded-3xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/10">
+                    <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 </div>
                 <div className="text-right">
-                    <div className="text-xs text-slate-400 uppercase tracking-widest font-bold">Status</div>
-                    <div className="text-sm text-green-400 font-semibold">Operational</div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-[0.2em] font-black mb-1">Status Proyek</div>
+                    <div className="text-xs text-green-600 font-black bg-green-500/10 px-3 py-1 rounded-lg uppercase tracking-widest border border-green-500/20">Operational</div>
                 </div>
               </div>
+              
               <div className="space-y-6">
-                {[1, 2].map((i) => (
-                    <div key={i} className="h-16 rounded-2xl border border-slate-700/50 flex items-center px-4 gap-4 bg-slate-900/30">
-                        <div className="w-8 h-8 rounded-lg bg-slate-800"></div>
-                        <div className="flex-1 space-y-2">
-                            <div className="h-2 w-24 bg-slate-700 rounded-full"></div>
-                            <div className="h-2 w-16 bg-slate-800 rounded-full"></div>
+                {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-20 rounded-3xl border border-slate-100 flex items-center px-6 gap-6 bg-white/40 hover:bg-white transition-colors cursor-default group/item">
+                        <div className="w-10 h-10 rounded-2xl bg-slate-50 group-hover/item:bg-amber-500/10 transition-colors"></div>
+                        <div className="flex-1 space-y-3">
+                            <div className="h-2.5 w-32 bg-slate-100 rounded-full group-hover/item:bg-amber-500/20 transition-colors"></div>
+                            <div className="h-2 w-20 bg-slate-50 rounded-full"></div>
                         </div>
                     </div>
                 ))}
               </div>
             </div>
-            <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-amber-700 rounded-[32px] opacity-10 blur-xl group-hover:opacity-20 transition-opacity"></div>
+            
+            {/* Soft decorative glow behind the card */}
+            <div className="absolute -inset-4 bg-gradient-to-r from-yellow-200 to-yellow-400 rounded-[60px] opacity-10 blur-3xl -z-10 group-hover:opacity-20 transition-opacity"></div>
           </div>
         </div>
       </main>
     </div>
   );
+}
 }
