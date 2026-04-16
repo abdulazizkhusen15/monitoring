@@ -1,16 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { InventoryTransaction, ProjectItem, TransactionType } from '../types/inventory';
 
-export interface ProjectItem {
-  id: string;
-  name: string;
-  quantity: string;
-  isCompleted: boolean;
-  createdAt: string;
-}
-
-export interface Project {
+interface Project extends Omit<ProjectItem, 'itemId'> {
   id: string;
   name: string;
   status: boolean;
@@ -18,24 +11,34 @@ export interface Project {
   items: ProjectItem[];
 }
 
+// Full Project interface update
+export interface ProjectExtended {
+  id: string;
+  name: string;
+  status: boolean;
+  createdAt: string;
+  items: ProjectItem[];
+  transactions: InventoryTransaction[];
+}
+
 interface ProjectContextType {
-  projects: Project[];
+  projects: ProjectExtended[];
   addProject: (name: string) => { success: boolean; message: string; data?: any };
   toggleProjectStatus: (id: string) => void;
-  addProjectItem: (projectId: string, name: string, quantity: string) => { success: boolean; message: string; data?: any };
-  toggleItemStatus: (projectId: string, itemId: string) => void;
+  addProjectItem: (projectId: string, name: string, itemCode: string, unit: string) => { success: boolean; message: string; data?: any };
+  addTransaction: (transaction: Omit<InventoryTransaction, 'id' | 'createdAt'>) => { success: boolean; message: string; data?: any };
   removeProjectItem: (projectId: string, itemId: string) => void;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: React.ReactNode }) {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<ProjectExtended[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Load from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('pentaland_projects');
+    const saved = localStorage.getItem('pentaland_projects_v2');
     if (saved) {
       try {
         setProjects(JSON.parse(saved));
@@ -49,11 +52,11 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
   // Save to localStorage whenever projects change
   useEffect(() => {
     if (isInitialized) {
-      localStorage.setItem('pentaland_projects', JSON.stringify(projects));
+      localStorage.setItem('pentaland_projects_v2', JSON.stringify(projects));
     }
   }, [projects, isInitialized]);
 
-  // Logging utility as requested
+  // Logging utility
   const logOperation = (action: string, result: any) => {
     console.log(JSON.stringify({
       timestamp: new Date().toISOString(),
@@ -75,12 +78,13 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       return result;
     }
 
-    const newProject: Project = {
+    const newProject: ProjectExtended = {
       id: Date.now().toString(),
       name: name.trim(),
       status: true,
       createdAt: new Date().toISOString(),
-      items: []
+      items: [],
+      transactions: []
     };
 
     setProjects(prev => [...prev, newProject]);
@@ -93,9 +97,20 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     setProjects(prev => prev.map(p => p.id === id ? { ...p, status: !p.status } : p));
   };
 
-  const addProjectItem = (projectId: string, name: string, quantity: string) => {
+  const addProjectItem = (projectId: string, name: string, itemCode: string, unit: string) => {
     const project = projects.find(p => p.id === projectId);
     if (!project) return { success: false, message: 'Proyek tidak ditemukan' };
+
+    // Validation: Check if itemCode already exists in ANY project and has a different unit
+    const existingItemWithSameCode = projects.flatMap(p => p.items).find(i => i.itemCode === itemCode);
+    if (existingItemWithSameCode && existingItemWithSameCode.unit !== unit) {
+      const result = { 
+        success: false, 
+        message: `Peringatan: Satuan tidak boleh diubah untuk Kode Barang '${itemCode}'! Satuan yang terdaftar adalah: ${existingItemWithSameCode.unit}` 
+      };
+      logOperation('ADD_ITEM_VALIDATION_ERROR', result);
+      return result;
+    }
 
     if (project.items.some(item => item.name.toLowerCase() === name.trim().toLowerCase())) {
       const result = { success: false, message: 'Barang sudah ada dalam proyek ini' };
@@ -105,10 +120,12 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
 
     const newItem: ProjectItem = {
       id: Date.now().toString(),
+      project_id: projectId,
       name: name.trim(),
-      quantity,
-      isCompleted: false,
-      createdAt: new Date().toISOString()
+      itemCode: itemCode.trim(),
+      unit,
+      createdAt: new Date().toISOString(),
+      isCompleted: false
     };
 
     setProjects(prev => prev.map(p => 
@@ -120,17 +137,29 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     return result;
   };
 
-  const toggleItemStatus = (projectId: string, itemId: string) => {
+  const addTransaction = (data: Omit<InventoryTransaction, 'id' | 'createdAt'>) => {
+    const transaction: InventoryTransaction = {
+      ...data,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString()
+    };
+
     setProjects(prev => prev.map(p => 
-      p.id === projectId 
-        ? { ...p, items: p.items.map(i => i.id === itemId ? { ...i, isCompleted: !i.isCompleted } : i) } 
-        : p
+      p.id === data.projectId ? { ...p, transactions: [...p.transactions, transaction] } : p
     ));
+
+    const result = { success: true, message: 'Transaksi berhasil dicatat', data: transaction };
+    logOperation('ADD_TRANSACTION', result);
+    return result;
   };
 
   const removeProjectItem = (projectId: string, itemId: string) => {
     setProjects(prev => prev.map(p => 
-      p.id === projectId ? { ...p, items: p.items.filter(i => i.id !== itemId) } : p
+      p.id === projectId ? { 
+        ...p, 
+        items: p.items.filter(i => i.id !== itemId),
+        transactions: p.transactions.filter(t => t.itemId !== itemId)
+      } : p
     ));
   };
 
@@ -140,7 +169,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       addProject,
       toggleProjectStatus,
       addProjectItem,
-      toggleItemStatus,
+      addTransaction,
       removeProjectItem
     }}>
       {children}
