@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, AlertCircle } from 'lucide-react';
 
 const schema = z.object({
   quantity: z.number().positive('Jumlah harus lebih dari 0'),
