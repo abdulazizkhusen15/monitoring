@@ -19,9 +19,10 @@ interface ModalProps {
   onSubmit: (data: FormData) => void;
   unit: string;
   quantityLimit?: number;
+  currentTotalIn?: number;
 }
 
-export default function ModalGoodsIn({ isOpen, onClose, onSubmit, unit, quantityLimit }: ModalProps) {
+export default function ModalGoodsIn({ isOpen, onClose, onSubmit, unit, quantityLimit, currentTotalIn = 0 }: ModalProps) {
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset, watch } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -29,8 +30,8 @@ export default function ModalGoodsIn({ isOpen, onClose, onSubmit, unit, quantity
     }
   });
 
-  const quantity = watch('quantity');
-  const isOverLimit = !!(quantityLimit && quantity > quantityLimit);
+  const quantity = watch('quantity') || 0;
+  const isOverLimit = !!(quantityLimit && (currentTotalIn + quantity) > quantityLimit);
 
   if (!isOpen) return null;
 
@@ -65,8 +66,10 @@ export default function ModalGoodsIn({ isOpen, onClose, onSubmit, unit, quantity
                 <AlertCircle className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-red-600 uppercase tracking-wider">Peringatan: Melebihi Batasan!</p>
-                <p className="text-[11px] text-red-500 font-bold uppercase mt-0.5">Kuantitas input ({quantity} {unit}) melebihi batasan yang ditetapkan ({quantityLimit} {unit}).</p>
+                <p className="text-[10px] font-black text-red-600 uppercase tracking-wider">Peringatan: Kuota Melebihi Batas!</p>
+                <p className="text-[11px] text-red-500 font-bold uppercase mt-0.5">
+                  Input ini ({quantity} {unit}) akan membuat total masuk ({currentTotalIn + quantity} {unit}) melebihi batasan ({quantityLimit} {unit}).
+                </p>
               </div>
             </div>
           )}
@@ -83,7 +86,12 @@ export default function ModalGoodsIn({ isOpen, onClose, onSubmit, unit, quantity
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Kuantitas ({unit})</label>
+              <div className="flex items-center justify-between ml-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Kuantitas ({unit})</label>
+                {quantityLimit && (
+                  <span className="text-[9px] font-black text-amber-600 uppercase">Kuota: {Math.max(0, quantityLimit - currentTotalIn)} {unit}</span>
+                )}
+              </div>
               <input
                 type="number"
                 step="0.01"

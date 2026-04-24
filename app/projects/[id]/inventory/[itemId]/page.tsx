@@ -137,6 +137,21 @@ export default function InventoryPage() {
           </div>
         )}
 
+        {/* Banner Melebihi Batas Kuantitas */}
+        {item.quantityLimit && summary.totalIn >= item.quantityLimit && (
+          <div className="bg-amber-50 border border-amber-200 rounded-[24px] md:rounded-[40px] p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-4 md:gap-8 shadow-xl shadow-amber-500/10">
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-[24px] bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
+              <AlertCircle className="w-6 h-6 md:w-8 md:h-8 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg md:text-xl font-black text-amber-600 uppercase tracking-tight">Peringatan: Kuota Terpenuhi!</h3>
+              <p className="text-[10px] md:text-sm text-amber-500/80 font-bold uppercase tracking-wider mt-1">
+                Total barang masuk ({summary.totalIn} {item.unit}) telah mencapai atau melebihi batasan yang ditetapkan ({item.quantityLimit} {item.unit}).
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-6">
           <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.4em] ml-1">Statistik Inventaris</h2>
           <SummaryCards summary={summary} unit={item.unit} />
@@ -287,6 +302,7 @@ export default function InventoryPage() {
         }}
         unit={item.unit}
         quantityLimit={item.quantityLimit}
+        currentTotalIn={summary.totalIn}
       />
       
       <ModalGoodsOut 
