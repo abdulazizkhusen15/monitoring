@@ -14,7 +14,8 @@ import Link from 'next/link';
 export default function InventoryPage() {
   const { id: projectId, itemId } = useParams();
   const router = useRouter();
-  const { loading } = useProject();
+  const { loading, updateProjectItem } = useProject();
+  const isAdmin = typeof window !== 'undefined' ? localStorage.getItem('pentaland_user_alias') === 'admin' : false;
   
   const { 
     project, 
@@ -29,6 +30,8 @@ export default function InventoryPage() {
 
   const [isModalInOpen, setIsModalInOpen] = useState(false);
   const [modalOutConfig, setModalOutConfig] = useState<{ open: boolean, type: 'OUT' | 'USAGE' }>({ open: false, type: 'OUT' });
+  const [isEditingLimits, setIsEditingLimits] = useState(false);
+  const [editData, setEditData] = useState({ quantityLimit: item?.quantityLimit || 0, notes: item?.notes || '' });
 
   if (loading) {
     return (
@@ -169,16 +172,78 @@ export default function InventoryPage() {
 
             <div className="glass-card-strong p-8 md:p-10 rounded-[32px] md:rounded-[48px] border-slate-100 bg-slate-50/50 relative overflow-hidden">
                <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 blur-3xl rounded-full"></div>
-              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6">Informasi Teknis</h4>
+              <div className="flex items-center justify-between mb-6">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Pengaturan Item</h4>
+                {isAdmin && !isEditingLimits && (
+                  <button 
+                    onClick={() => {
+                      setEditData({ quantityLimit: item.quantityLimit || 0, notes: item.notes || '' });
+                      setIsEditingLimits(true);
+                    }}
+                    className="text-[9px] font-black uppercase tracking-widest text-amber-600 hover:text-amber-700"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+              
               <div className="space-y-4 md:space-y-6">
-                <div className="flex items-center justify-between py-4 border-b border-slate-100">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Kode Katalog</span>
-                  <span className="text-sm font-black text-slate-900 bg-white px-3 py-1 rounded-lg border border-slate-100">{item.itemCode}</span>
+                <div className="flex flex-col gap-2 py-4 border-b border-slate-100">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Batas Kuantitas</span>
+                  {isEditingLimits ? (
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="number" 
+                        value={editData.quantityLimit}
+                        onChange={(e) => setEditData({ ...editData, quantityLimit: Number(e.target.value) })}
+                        className="w-full bg-white border border-yellow-200 rounded-lg px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-yellow-500/20"
+                      />
+                      <span className="text-[10px] font-black text-slate-400 uppercase">{item.unit}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-black text-slate-900">{item.quantityLimit || '-'} {item.unit}</span>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center justify-between py-4 border-b border-slate-100">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Satuan Tetap</span>
-                  <span className="text-sm font-black text-amber-600 uppercase">{item.unit}</span>
+
+                <div className="flex flex-col gap-2 py-4 border-b border-slate-100">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Catatan Inventaris</span>
+                  {isEditingLimits ? (
+                    <textarea 
+                      value={editData.notes}
+                      onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
+                      placeholder="Catatan khusus untuk item ini..."
+                      rows={3}
+                      className="w-full bg-white border border-yellow-200 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-yellow-500/20 resize-none"
+                    />
+                  ) : (
+                    <p className="text-xs font-bold text-slate-500 leading-relaxed italic">
+                      {item.notes || 'Tidak ada catatan khusus.'}
+                    </p>
+                  )}
                 </div>
+
+                {isEditingLimits && (
+                  <div className="flex gap-2 pt-2">
+                    <button 
+                      onClick={() => setIsEditingLimits(false)}
+                      className="flex-1 py-3 rounded-xl bg-slate-100 text-[9px] font-black uppercase tracking-widest text-slate-500"
+                    >
+                      Batal
+                    </button>
+                    <button 
+                      onClick={async () => {
+                        const res = await updateProjectItem(item.id, editData);
+                        if (res.success) setIsEditingLimits(false);
+                        else alert(res.message);
+                      }}
+                      className="flex-[2] py-3 rounded-xl bg-yellow-500 text-[9px] font-black uppercase tracking-widest text-white shadow-lg shadow-yellow-500/20"
+                    >
+                      Simpan
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -200,6 +265,7 @@ export default function InventoryPage() {
           if (!res.success) alert(res.message);
         }}
         unit={item.unit}
+        quantityLimit={item.quantityLimit}
       />
       
       <ModalGoodsOut 

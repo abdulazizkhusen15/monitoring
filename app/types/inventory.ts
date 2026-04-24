@@ -18,7 +18,9 @@ export interface ProjectItem {
   itemCode: string;
   unit: string;
   createdAt: string;
-  isCompleted: boolean; // Keep for legacy compatibility if needed
+  isCompleted: boolean;
+  quantityLimit?: number;
+  notes?: string;
 }
 
 export const VALID_UNITS = [

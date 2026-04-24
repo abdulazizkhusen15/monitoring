@@ -23,6 +23,8 @@ create table if not exists project_items (
   item_code text not null,
   unit text not null,
   is_completed boolean default false,
+  quantity_limit decimal,
+  notes text,
   created_at timestamptz default now(),
   unique(project_id, name)
 );

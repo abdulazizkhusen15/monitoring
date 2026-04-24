@@ -20,7 +20,8 @@ interface ProjectContextType {
   loading: boolean;
   addProject: (name: string) => Promise<{ success: boolean; message: string; data?: any }>;
   toggleProjectStatus: (id: string, currentStatus: boolean) => Promise<void>;
-  addProjectItem: (projectId: string, name: string, itemCode: string, unit: string) => Promise<{ success: boolean; message: string; data?: any }>;
+  addProjectItem: (projectId: string, name: string, itemCode: string, unit: string, quantityLimit?: number, notes?: string) => Promise<{ success: boolean; message: string; data?: any }>;
+  updateProjectItem: (itemId: string, data: { quantityLimit?: number; notes?: string }) => Promise<{ success: boolean; message: string }>;
   addTransaction: (transaction: Omit<InventoryTransaction, 'id' | 'createdAt'>) => Promise<{ success: boolean; message: string; data?: any }>;
   removeProjectItem: (projectId: string, itemId: string) => Promise<void>;
   deleteProject: (id: string) => Promise<{ success: boolean; message: string }>;
@@ -97,6 +98,8 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
           itemCode: i.item_code,
           unit: i.unit,
           isCompleted: i.is_completed,
+          quantityLimit: i.quantity_limit,
+          notes: i.notes,
           createdAt: i.created_at
         })),
         transactions: (p.transactions || []).map((t: any) => ({
@@ -150,7 +153,9 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
             name: i.name,
             item_code: i.itemCode,
             unit: i.unit,
-            is_completed: i.isCompleted
+            is_completed: i.isCompleted,
+            quantity_limit: i.quantityLimit,
+            notes: i.notes
           }));
           
           const { data: newItems, error: iErr } = await supabase
@@ -237,7 +242,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addProjectItem = async (projectId: string, name: string, itemCode: string, unit: string) => {
+  const addProjectItem = async (projectId: string, name: string, itemCode: string, unit: string, quantityLimit?: number, notes?: string) => {
     if (!user) return { success: false, message: 'Harus login' };
 
     const { data, error } = await supabase
@@ -247,7 +252,9 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
         user_id: user.id,
         name: name.trim(),
         item_code: itemCode.trim(),
-        unit
+        unit,
+        quantity_limit: quantityLimit,
+        notes
       })
       .select()
       .single();
@@ -262,6 +269,8 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       name: data.name,
       itemCode: data.item_code,
       unit: data.unit,
+      quantityLimit: data.quantity_limit,
+      notes: data.notes,
       createdAt: data.created_at,
       isCompleted: data.is_completed
     };
@@ -271,6 +280,27 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     ));
 
     return { success: true, message: 'Barang berhasil ditambahkan', data: newItem };
+  };
+
+  const updateProjectItem = async (itemId: string, data: { quantityLimit?: number; notes?: string }) => {
+    if (!user) return { success: false, message: 'Harus login' };
+
+    const { error } = await supabase
+      .from('project_items')
+      .update({
+        quantity_limit: data.quantityLimit,
+        notes: data.notes
+      })
+      .eq('id', itemId);
+
+    if (error) return { success: false, message: error.message };
+
+    setProjects(prev => prev.map(p => ({
+      ...p,
+      items: p.items.map(i => i.id === itemId ? { ...i, ...data } : i)
+    })));
+
+    return { success: true, message: 'Data barang berhasil diperbarui' };
   };
 
   const addTransaction = async (data: Omit<InventoryTransaction, 'id' | 'createdAt'>) => {
@@ -402,6 +432,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       addProject,
       toggleProjectStatus,
       addProjectItem,
+      updateProjectItem,
       addTransaction,
       removeProjectItem,
       deleteProject,
