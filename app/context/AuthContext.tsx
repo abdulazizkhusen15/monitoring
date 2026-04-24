@@ -35,7 +35,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
       
       if (_event === 'SIGNED_IN') {
-        router.push('/dashboard');
+        // Only redirect to dashboard if user is on the login page
+        if (window.location.pathname === '/') {
+          router.push('/dashboard');
+        }
       }
       
       if (_event === 'SIGNED_OUT') {

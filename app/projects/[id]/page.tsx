@@ -2,7 +2,7 @@
 
 import { useProject } from '@/app/context/ProjectContext';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { VALID_UNITS, Unit } from '@/app/types/inventory';
 import { Package, Plus, ChevronRight, Settings } from 'lucide-react';
@@ -10,7 +10,7 @@ import { Package, Plus, ChevronRight, Settings } from 'lucide-react';
 export default function ProjectDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { projects, loading, addProjectItem, removeProjectItem, toggleProjectStatus } = useProject();
+  const { projects, loading, addProjectItem, removeProjectItem, toggleProjectStatus, isUnlocked } = useProject();
   
   const project = projects.find(p => p.id === id);
   
@@ -18,6 +18,13 @@ export default function ProjectDetailPage() {
   const [itemCode, setItemCode] = useState('');
   const [unit, setUnit] = useState<Unit>(VALID_UNITS[0]);
   const [error, setError] = useState('');
+
+  // Security Check: Redirect if project is locked and not admin
+  useEffect(() => {
+    if (!loading && project && !isUnlocked(project.id)) {
+      router.push('/projects');
+    }
+  }, [project, loading, isUnlocked, router]);
 
   const handleAddItem = async () => {
     if (!itemName || !itemCode || !unit) {

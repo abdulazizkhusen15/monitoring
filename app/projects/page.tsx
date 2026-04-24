@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useProject } from '@/app/context/ProjectContext';
 import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Trash2, Lock, Unlock, Key, ShieldCheck } from 'lucide-react';
 
 export default function ProjectsPage() {
-  const { projects, loading, addProject, toggleProjectStatus, deleteProject, updateProjectPin } = useProject();
+  const { projects, loading, addProject, toggleProjectStatus, deleteProject, updateProjectPin, unlockProject, isUnlocked } = useProject();
   const { user } = useAuth();
+  const router = useRouter();
   const [newProjectName, setNewProjectName] = useState('');
   const [error, setError] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
@@ -18,7 +20,6 @@ export default function ProjectsPage() {
     open: false, projectId: '', action: 'ENTER' 
   });
   const [pinValue, setPinValue] = useState('');
-  const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
 
   useEffect(() => {
     const alias = localStorage.getItem('pentaland_user_alias');
@@ -46,13 +47,12 @@ export default function ProjectsPage() {
 
   const submitPin = async () => {
     if (pinModal.action === 'ENTER') {
-      const project = projects.find(p => p.id === pinModal.projectId);
-      if (project?.pin === pinValue) {
-        setUnlockedIds(prev => [...prev, project.id]);
-        const targetUrl = `/projects/${project.id}`;
+      const success = unlockProject(pinModal.projectId, pinValue);
+      if (success) {
+        const targetUrl = `/projects/${pinModal.projectId}`;
         setPinModal({ open: false, projectId: '', action: 'ENTER' });
         setPinValue('');
-        window.location.href = targetUrl;
+        router.push(targetUrl);
       } else {
         alert('PIN Salah!');
       }
@@ -180,7 +180,7 @@ export default function ProjectsPage() {
                   <div key={p.id} className="relative group">
                     <div className="flex items-center justify-between p-6 bg-gradient-to-br from-white/80 to-yellow-50/40 border border-yellow-200/50 rounded-[32px] hover:bg-white hover:border-yellow-500/30 hover:shadow-lg transition-all group backdrop-blur-xl">
                       <div className="flex-1">
-                        {(!p.pin || isAdmin || unlockedIds.includes(p.id)) ? (
+                        {isUnlocked(p.id) ? (
                           <Link href={`/projects/${p.id}`}>
                             <h4 className="font-black text-xl text-slate-900 group-hover:text-amber-600 transition-colors">{p.name}</h4>
                             <div className="flex items-center gap-2 mt-1">

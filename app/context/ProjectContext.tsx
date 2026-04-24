@@ -28,6 +28,9 @@ interface ProjectContextType {
   addLogisticUser: (username: string, pin: string) => Promise<{ success: boolean; message: string }>;
   deleteLogisticUser: (id: string) => Promise<{ success: boolean; message: string }>;
   getLogisticUsers: () => Promise<any[]>;
+  unlockedIds: string[];
+  isUnlocked: (id: string) => boolean;
+  unlockProject: (id: string, pin: string) => boolean;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -36,6 +39,26 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [projects, setProjects] = useState<ProjectExtended[]>([]);
   const [loading, setLoading] = useState(true);
+  const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
+
+  // Load unlocked IDs from sessionStorage on mount
+  useEffect(() => {
+    const saved = sessionStorage.getItem('pentaland_unlocked_projects');
+    if (saved) {
+      try {
+        setUnlockedIds(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to load unlocked IDs:', e);
+      }
+    }
+  }, []);
+
+  // Save unlocked IDs to sessionStorage when they change
+  useEffect(() => {
+    if (unlockedIds.length > 0) {
+      sessionStorage.setItem('pentaland_unlocked_projects', JSON.stringify(unlockedIds));
+    }
+  }, [unlockedIds]);
 
   // 1. Fetch data from Supabase
   const fetchData = async () => {
@@ -350,6 +373,28 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     return data;
   };
 
+  const isUnlocked = (id: string) => {
+    const project = projects.find(p => p.id === id);
+    if (!project || !project.pin) return true;
+    
+    // Admin always has access
+    const alias = typeof window !== 'undefined' ? localStorage.getItem('pentaland_user_alias') : null;
+    if (alias === 'admin') return true;
+
+    return unlockedIds.includes(id);
+  };
+
+  const unlockProject = (id: string, pin: string) => {
+    const project = projects.find(p => p.id === id);
+    if (project && project.pin === pin) {
+      if (!unlockedIds.includes(id)) {
+        setUnlockedIds(prev => [...prev, id]);
+      }
+      return true;
+    }
+    return false;
+  };
+
   return (
     <ProjectContext.Provider value={{
       projects,
@@ -363,7 +408,10 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       updateProjectPin,
       addLogisticUser,
       deleteLogisticUser,
-      getLogisticUsers
+      getLogisticUsers,
+      unlockedIds,
+      isUnlocked,
+      unlockProject
     }}>
       {children}
     </ProjectContext.Provider>
