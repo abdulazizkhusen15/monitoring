@@ -156,15 +156,73 @@ export default function InventoryPage() {
               <AlertCircle className="w-8 h-8 md:w-10 md:h-10 text-white" />
             </div>
             
-            <div className="relative">
+            <div className="relative w-full">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/50 border border-red-200 text-[9px] font-black text-red-600 uppercase tracking-widest mb-3">
                 <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping"></span>
                 Limit Tercapai
               </div>
               <h3 className="text-xl md:text-3xl font-black text-red-600 uppercase tracking-tighter leading-tight mb-2">Kuota Terpenuhi!</h3>
-              <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wide leading-relaxed max-w-2xl">
+              <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wide leading-relaxed max-w-2xl mb-6">
                 Total barang masuk <span className="text-red-600 font-black">({summary.totalIn} {item.unit})</span> telah mencapai atau melebihi batasan yang ditetapkan <span className="text-slate-900 font-black">({item.quantityLimit} {item.unit})</span>.
               </p>
+
+              <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 bg-white/60 border border-red-100 rounded-3xl p-5 sm:p-6 shadow-sm max-w-xl">
+                {/* SVG Donut Chart */}
+                <div className="relative w-24 h-24 shrink-0">
+                  <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                    {/* Background Ring */}
+                    <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#f1f5f9" strokeWidth="4" />
+                    
+                    {/* Barang Keluar Ring */}
+                    {summary.totalIn > 0 && summary.totalOut > 0 && (
+                      <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#a855f7" strokeWidth="4" strokeDasharray={`${(summary.totalOut / summary.totalIn) * 100} ${100 - (summary.totalOut / summary.totalIn) * 100}`} strokeDashoffset="0" strokeLinecap="round" />
+                    )}
+                    
+                    {/* Barang Terpakai Ring */}
+                    {summary.totalIn > 0 && summary.totalUsage > 0 && (
+                      <circle cx="18" cy="18" r="15.9155" fill="transparent" stroke="#eab308" strokeWidth="4" strokeDasharray={`${(summary.totalUsage / summary.totalIn) * 100} ${100 - (summary.totalUsage / summary.totalIn) * 100}`} strokeDashoffset={`-${(summary.totalOut / summary.totalIn) * 100}`} strokeLinecap="round" />
+                    )}
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Total</span>
+                    <span className="text-sm font-black text-slate-800 leading-none mt-0.5">{summary.totalIn}</span>
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="flex-1 w-full space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-purple-500 shadow-sm"></div>
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Keluar (Distribusi)</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-black text-slate-800">{summary.totalOut}</span>
+                      <span className="text-[9px] font-bold text-slate-400 ml-1">{item.unit}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-sm"></div>
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Terpakai (Aktual)</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-black text-slate-800">{summary.totalUsage}</span>
+                      <span className="text-[9px] font-bold text-slate-400 ml-1">{item.unit}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-200/60">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sisa Stok</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-black text-slate-800">{summary.currentStock}</span>
+                      <span className="text-[9px] font-bold text-slate-400 ml-1">{item.unit}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
