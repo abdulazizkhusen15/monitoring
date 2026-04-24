@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useInventory } from '@/app/hooks/useInventory';
 import { useProject } from '@/app/context/ProjectContext';
 import SummaryCards from '@/app/components/inventory/SummaryCards';
