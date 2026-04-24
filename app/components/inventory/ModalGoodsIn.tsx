@@ -30,7 +30,7 @@ export default function ModalGoodsIn({ isOpen, onClose, onSubmit, unit, quantity
   });
 
   const quantity = watch('quantity');
-  const isOverLimit = quantityLimit && quantity > quantityLimit;
+  const isOverLimit = !!(quantityLimit && quantity > quantityLimit);
 
   if (!isOpen) return null;
 
