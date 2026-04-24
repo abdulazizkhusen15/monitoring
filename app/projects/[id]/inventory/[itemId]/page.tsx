@@ -126,27 +126,36 @@ export default function InventoryPage() {
         
         {/* Banner Stok Habis/Kritis */}
         {isCritical && (
-          <div className="bg-red-50 border border-red-100 rounded-[24px] md:rounded-[40px] p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-4 md:gap-8 animate-pulse shadow-xl shadow-red-500/5">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-[24px] bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/20 shrink-0">
-              <AlertCircle className="w-6 h-6 md:w-8 md:h-8 text-white" />
+          <div className="relative overflow-hidden bg-gradient-to-br from-red-50 to-white/90 backdrop-blur-xl border border-red-200/60 rounded-[32px] md:rounded-[48px] p-8 md:p-10 flex flex-col md:flex-row md:items-center gap-6 md:gap-10 shadow-2xl shadow-red-500/5 group animate-pulse">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 blur-3xl rounded-full -mr-20 -mt-20"></div>
+            <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-[24px] md:rounded-[32px] bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center shadow-xl shadow-red-600/30 shrink-0">
+              <AlertCircle className="w-8 h-8 md:w-10 md:h-10 text-white" />
             </div>
-            <div>
-              <h3 className="text-lg md:text-xl font-black text-red-600 uppercase tracking-tight">Peringatan: Stok Habis!</h3>
-              <p className="text-[10px] md:text-sm text-red-500/80 font-bold uppercase tracking-wider mt-1">Stok barang saat ini kosong. Segera lakukan pengadaan untuk melanjutkan proyek.</p>
+            <div className="relative">
+              <h3 className="text-xl md:text-3xl font-black text-red-600 uppercase tracking-tighter leading-tight mb-2">Peringatan: Stok Habis!</h3>
+              <p className="text-xs md:text-sm text-red-500/80 font-bold uppercase tracking-wide leading-relaxed max-w-2xl">Stok barang saat ini kosong. Segera lakukan pengadaan untuk melanjutkan proyek.</p>
             </div>
           </div>
         )}
 
         {/* Banner Melebihi Batas Kuantitas */}
         {item.quantityLimit && summary.totalIn >= item.quantityLimit && (
-          <div className="bg-amber-50 border border-amber-200 rounded-[24px] md:rounded-[40px] p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-4 md:gap-8 shadow-xl shadow-amber-500/10">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-[24px] bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
-              <AlertCircle className="w-6 h-6 md:w-8 md:h-8 text-white" />
+          <div className="relative overflow-hidden bg-gradient-to-br from-red-50/90 to-white/90 backdrop-blur-xl border border-red-200/60 rounded-[32px] md:rounded-[48px] p-8 md:p-10 flex flex-col md:flex-row md:items-center gap-6 md:gap-10 shadow-2xl shadow-red-500/5 group transition-all hover:shadow-red-500/10">
+            {/* Decorative element */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 blur-3xl rounded-full -mr-20 -mt-20"></div>
+            
+            <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-[24px] md:rounded-[32px] bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-xl shadow-red-500/30 shrink-0 rotate-3 group-hover:rotate-0 transition-transform duration-500">
+              <AlertCircle className="w-8 h-8 md:w-10 md:h-10 text-white" />
             </div>
-            <div>
-              <h3 className="text-lg md:text-xl font-black text-amber-600 uppercase tracking-tight">Peringatan: Kuota Terpenuhi!</h3>
-              <p className="text-[10px] md:text-sm text-amber-500/80 font-bold uppercase tracking-wider mt-1">
-                Total barang masuk ({summary.totalIn} {item.unit}) telah mencapai atau melebihi batasan yang ditetapkan ({item.quantityLimit} {item.unit}).
+            
+            <div className="relative">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100/50 border border-red-200 text-[9px] font-black text-red-600 uppercase tracking-widest mb-3">
+                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping"></span>
+                Limit Tercapai
+              </div>
+              <h3 className="text-xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter leading-tight mb-2">Kuota Terpenuhi!</h3>
+              <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wide leading-relaxed max-w-2xl">
+                Total barang masuk <span className="text-red-600 font-black">({summary.totalIn} {item.unit})</span> telah mencapai atau melebihi batasan yang ditetapkan <span className="text-slate-900 font-black">({item.quantityLimit} {item.unit})</span>.
               </p>
             </div>
           </div>
