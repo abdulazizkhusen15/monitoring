@@ -29,7 +29,7 @@ interface ProjectContextType {
   addLogisticUser: (username: string, pin: string) => Promise<{ success: boolean; message: string }>;
   deleteLogisticUser: (id: string) => Promise<{ success: boolean; message: string }>;
   getLogisticUsers: () => Promise<any[]>;
-  unlockedIds: string[];
+  unlockedPins: Record<string, string>;
   isUnlocked: (id: string) => boolean;
   unlockProject: (id: string, pin: string) => boolean;
 }
@@ -40,26 +40,26 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [projects, setProjects] = useState<ProjectExtended[]>([]);
   const [loading, setLoading] = useState(true);
-  const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
+  const [unlockedPins, setUnlockedPins] = useState<Record<string, string>>({});
 
   // Load unlocked IDs from sessionStorage on mount
   useEffect(() => {
-    const saved = sessionStorage.getItem('pentaland_unlocked_projects');
+    const saved = sessionStorage.getItem('pentaland_unlocked_pins');
     if (saved) {
       try {
-        setUnlockedIds(JSON.parse(saved));
+        setUnlockedPins(JSON.parse(saved));
       } catch (e) {
-        console.error('Failed to load unlocked IDs:', e);
+        console.error('Failed to load unlocked pins:', e);
       }
     }
   }, []);
 
-  // Save unlocked IDs to sessionStorage when they change
+  // Save unlocked pins to sessionStorage when they change
   useEffect(() => {
-    if (unlockedIds.length > 0) {
-      sessionStorage.setItem('pentaland_unlocked_projects', JSON.stringify(unlockedIds));
+    if (Object.keys(unlockedPins).length > 0) {
+      sessionStorage.setItem('pentaland_unlocked_pins', JSON.stringify(unlockedPins));
     }
-  }, [unlockedIds]);
+  }, [unlockedPins]);
 
   // 1. Fetch data from Supabase
   const fetchData = async () => {
@@ -411,15 +411,14 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     const alias = typeof window !== 'undefined' ? localStorage.getItem('pentaland_user_alias') : null;
     if (alias === 'admin') return true;
 
-    return unlockedIds.includes(id);
+    // Check if the pin used to unlock matches the current pin
+    return unlockedPins[id] === project.pin;
   };
 
   const unlockProject = (id: string, pin: string) => {
     const project = projects.find(p => p.id === id);
     if (project && project.pin === pin) {
-      if (!unlockedIds.includes(id)) {
-        setUnlockedIds(prev => [...prev, id]);
-      }
+      setUnlockedPins(prev => ({ ...prev, [id]: pin }));
       return true;
     }
     return false;
@@ -440,7 +439,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       addLogisticUser,
       deleteLogisticUser,
       getLogisticUsers,
-      unlockedIds,
+      unlockedPins,
       isUnlocked,
       unlockProject
     }}>

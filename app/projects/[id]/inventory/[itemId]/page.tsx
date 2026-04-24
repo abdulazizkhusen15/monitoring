@@ -16,7 +16,6 @@ export default function InventoryPage() {
   const router = useRouter();
   const { loading, updateProjectItem } = useProject();
   
-  // Admin check - immediate check for better responsiveness
   const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -24,7 +23,7 @@ export default function InventoryPage() {
       setIsAdmin(['admin', 'henny', 'ko awi'].includes(alias?.toLowerCase().trim() || ''));
     }
   }, []);
-  
+
   const { 
     project, 
     item, 
@@ -35,6 +34,15 @@ export default function InventoryPage() {
     addUsage,
     isCritical 
   } = useInventory(projectId as string, itemId as string);
+
+  const { isUnlocked } = useProject();
+
+  // Security Check: Redirect if project is locked and not admin
+  useEffect(() => {
+    if (!loading && project && !isAdmin && !isUnlocked(project.id)) {
+      router.push('/projects');
+    }
+  }, [project, loading, isAdmin, isUnlocked, router]);
 
   const [isModalInOpen, setIsModalInOpen] = useState(false);
   const [modalOutConfig, setModalOutConfig] = useState<{ open: boolean, type: 'OUT' | 'USAGE' }>({ open: false, type: 'OUT' });
