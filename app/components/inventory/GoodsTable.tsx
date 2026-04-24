@@ -1,9 +1,9 @@
 'use client';
 
 import { InventoryTransaction } from '@/app/types/inventory';
-import { format } from 'date-fns';
+import { format, subDays, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { ArrowDownLeft, ArrowUpRight, Package, Search } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Package, Search, Calendar } from 'lucide-react';
 import { useState } from 'react';
 
 interface GoodsTableProps {
@@ -13,8 +13,39 @@ interface GoodsTableProps {
 
 export default function GoodsTable({ transactions, unit }: GoodsTableProps) {
   const [filter, setFilter] = useState<'ALL' | 'IN' | 'OUT' | 'USAGE'>('ALL');
+  const [dateFilter, setDateFilter] = useState<'TODAY' | 'YESTERDAY' | '7DAYS' | '30DAYS' | 'CUSTOM'>('TODAY');
+  const [customRange, setCustomRange] = useState({ start: '', end: '' });
 
-  const filtered = transactions.filter(t => filter === 'ALL' || t.type === filter);
+  const now = new Date();
+  
+  const filteredByDate = transactions.filter(t => {
+    const tDate = new Date(t.date);
+    switch (dateFilter) {
+      case 'TODAY':
+        return format(tDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
+      case 'YESTERDAY':
+        const yesterday = subDays(now, 1);
+        return format(tDate, 'yyyy-MM-dd') === format(yesterday, 'yyyy-MM-dd');
+      case '7DAYS':
+        return isWithinInterval(tDate, { start: startOfDay(subDays(now, 7)), end: endOfDay(now) });
+      case '30DAYS':
+        return isWithinInterval(tDate, { start: startOfDay(subDays(now, 30)), end: endOfDay(now) });
+      case 'CUSTOM':
+        if (!customRange.start || !customRange.end) return true;
+        try {
+          return isWithinInterval(tDate, { 
+            start: startOfDay(new Date(customRange.start)), 
+            end: endOfDay(new Date(customRange.end)) 
+          });
+        } catch (e) {
+          return true;
+        }
+      default:
+        return true;
+    }
+  });
+
+  const filtered = filteredByDate.filter(t => filter === 'ALL' || t.type === filter);
 
   const getBadgeStyle = (type: string) => {
     switch (type) {
@@ -60,6 +91,46 @@ export default function GoodsTable({ transactions, unit }: GoodsTableProps) {
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="px-6 md:px-10 py-6 bg-slate-50/30 border-b border-slate-100 space-y-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2">
+            <Calendar className="w-3 h-3" /> Rentang Waktu:
+          </div>
+          {(['TODAY', 'YESTERDAY', '7DAYS', '30DAYS', 'CUSTOM'] as const).map((d) => (
+            <button
+              key={d}
+              onClick={() => setDateFilter(d)}
+              className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all border ${dateFilter === d ? 'bg-white border-yellow-500 text-amber-600 shadow-sm' : 'bg-transparent border-slate-200 text-slate-400 hover:border-slate-300'}`}
+            >
+              {d === 'TODAY' ? 'Hari Ini' : d === 'YESTERDAY' ? 'Kemarin' : d === '7DAYS' ? '7 Hari' : d === '30DAYS' ? '30 Hari' : 'Custom'}
+            </button>
+          ))}
+        </div>
+
+        {dateFilter === 'CUSTOM' && (
+          <div className="flex flex-wrap items-center gap-4 animate-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center gap-3">
+              <label className="text-[9px] font-black text-slate-400 uppercase">Dari:</label>
+              <input 
+                type="date" 
+                className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[10px] font-bold outline-none focus:border-yellow-500 transition-all"
+                value={customRange.start}
+                onChange={e => setCustomRange({...customRange, start: e.target.value})}
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="text-[9px] font-black text-slate-400 uppercase">Sampai:</label>
+              <input 
+                type="date" 
+                className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[10px] font-bold outline-none focus:border-yellow-500 transition-all"
+                value={customRange.end}
+                onChange={e => setCustomRange({...customRange, end: e.target.value})}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="overflow-x-auto">
