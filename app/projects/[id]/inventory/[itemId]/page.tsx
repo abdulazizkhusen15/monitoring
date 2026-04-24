@@ -153,7 +153,7 @@ export default function InventoryPage() {
                 <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping"></span>
                 Limit Tercapai
               </div>
-              <h3 className="text-xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter leading-tight mb-2">Kuota Terpenuhi!</h3>
+              <h3 className="text-xl md:text-3xl font-black text-red-600 uppercase tracking-tighter leading-tight mb-2">Kuota Terpenuhi!</h3>
               <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wide leading-relaxed max-w-2xl">
                 Total barang masuk <span className="text-red-600 font-black">({summary.totalIn} {item.unit})</span> telah mencapai atau melebihi batasan yang ditetapkan <span className="text-slate-900 font-black">({item.quantityLimit} {item.unit})</span>.
               </p>
