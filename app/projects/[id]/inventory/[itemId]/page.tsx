@@ -15,7 +15,13 @@ export default function InventoryPage() {
   const { id: projectId, itemId } = useParams();
   const router = useRouter();
   const { loading, updateProjectItem } = useProject();
-  const isAdmin = typeof window !== 'undefined' ? localStorage.getItem('pentaland_user_alias') === 'admin' : false;
+  
+  // Admin check - includes hardcoded admin accounts
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    const alias = localStorage.getItem('pentaland_user_alias');
+    setIsAdmin(['admin', 'henny', 'ko awi'].includes(alias || ''));
+  }, []);
   
   const { 
     project, 
@@ -31,7 +37,17 @@ export default function InventoryPage() {
   const [isModalInOpen, setIsModalInOpen] = useState(false);
   const [modalOutConfig, setModalOutConfig] = useState<{ open: boolean, type: 'OUT' | 'USAGE' }>({ open: false, type: 'OUT' });
   const [isEditingLimits, setIsEditingLimits] = useState(false);
-  const [editData, setEditData] = useState({ quantityLimit: item?.quantityLimit || 0, notes: item?.notes || '' });
+  const [editData, setEditData] = useState({ quantityLimit: 0, notes: '' });
+
+  // Sync editData when item loads or changes
+  useEffect(() => {
+    if (item) {
+      setEditData({ 
+        quantityLimit: item.quantityLimit || 0, 
+        notes: item.notes || '' 
+      });
+    }
+  }, [item]);
 
   if (loading) {
     return (
