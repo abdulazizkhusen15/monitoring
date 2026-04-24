@@ -119,7 +119,7 @@ export default function Home() {
       
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-md mx-4">
-        <div className="glass-card-strong rounded-[48px] border-yellow-400/30 overflow-hidden bg-gradient-to-br from-white/90 to-yellow-50/50 shadow-2xl">
+        <div className="glass-card-strong rounded-[32px] md:rounded-[48px] border-yellow-400/30 overflow-hidden bg-gradient-to-br from-white/90 to-yellow-50/50 shadow-2xl">
           {/* Header */}
           <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 px-8 py-12 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 animate-pulse"></div>
@@ -129,7 +129,7 @@ export default function Home() {
                 <span className="text-white font-black text-4xl">P</span>
               </div>
               
-              <h1 className="text-4xl font-black text-white tracking-tighter drop-shadow-lg">
+              <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter drop-shadow-lg">
                 PENTALAND
               </h1>
               <p className="text-yellow-100 mt-2 text-[10px] font-black uppercase tracking-[0.3em] opacity-80">
@@ -139,8 +139,8 @@ export default function Home() {
           </div>
 
           {/* Form Content */}
-          <div className="px-10 py-10">
-            <h2 className="text-2xl font-black text-slate-900 mb-8 text-center uppercase tracking-tight">
+          <div className="px-6 py-8 md:px-10 md:py-10">
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 mb-8 text-center uppercase tracking-tight">
               Selamat Datang Kembali
             </h2>
 

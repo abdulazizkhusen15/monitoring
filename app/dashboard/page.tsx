@@ -114,7 +114,7 @@ export default function DashboardPage() {
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
               {isAdmin ? 'System Administrator' : 'Operator Logistik'}
             </div>
-            <h2 className="text-7xl font-black tracking-tighter leading-[0.9] text-slate-900 uppercase">
+            <h2 className="text-4xl md:text-7xl font-black tracking-tighter leading-[0.9] text-slate-900 uppercase">
               Welcome, <br/>
               <span className="text-gold-gradient drop-shadow-sm">{displayUsername}</span>
             </h2>
@@ -124,7 +124,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-6 pt-4">
               <button 
                 onClick={() => router.push('/projects')}
-                className="btn-modern px-10 py-5 rounded-2xl font-black text-black shadow-2xl flex items-center gap-4 hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-xs"
+                className="btn-modern px-6 md:px-10 py-4 md:py-5 rounded-xl md:rounded-2xl font-black text-black shadow-2xl flex items-center gap-4 hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-[10px] md:text-xs"
               >
                 Monitoring Proyek
                 <ArrowRight className="w-5 h-5" />
@@ -133,9 +133,9 @@ export default function DashboardPage() {
           </div>
 
           <div className="relative group">
-            <div className="glass-card-strong rounded-[48px] p-10 border-yellow-400/30 shadow-2xl bg-gradient-to-br from-white/90 to-yellow-50/50">
-               <ShieldCheck className="w-20 h-20 text-yellow-500 mb-8 opacity-20" />
-               <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-4">Ringkasan Sistem</h3>
+            <div className="glass-card-strong rounded-[32px] md:rounded-[48px] p-6 md:p-10 border-yellow-400/30 shadow-2xl bg-gradient-to-br from-white/90 to-yellow-50/50">
+               <ShieldCheck className="w-12 h-12 md:w-20 md:h-20 text-yellow-500 mb-8 opacity-20" />
+               <h3 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tighter mb-4">Ringkasan Sistem</h3>
                <p className="text-sm text-slate-500 font-bold uppercase tracking-widest leading-loose">
                  Semua data tersinkronisasi dengan server cloud Pentaland. Pastikan setiap input barang keluar & masuk dicatat dengan teliti.
                </p>
@@ -147,12 +147,12 @@ export default function DashboardPage() {
         {/* Admin Only: Team Management */}
         {isAdmin && (
           <div className="space-y-12 animate-in slide-in-from-bottom-10 duration-700">
-            <div className="flex items-center gap-6">
-              <div className="w-14 h-14 rounded-3xl bg-slate-900 flex items-center justify-center text-white shadow-xl shadow-slate-900/20">
+            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+              <div className="w-14 h-14 rounded-2xl md:rounded-3xl bg-slate-900 flex items-center justify-center text-white shadow-xl shadow-slate-900/20">
                 <Users className="w-7 h-7" />
               </div>
               <div>
-                <h3 className="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none mb-2">Kelola Tim Logistic</h3>
+                <h3 className="text-3xl md:text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none mb-2">Kelola Tim Logistic</h3>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Hanya Admin yang dapat menambah & menghapus akses</p>
               </div>
             </div>

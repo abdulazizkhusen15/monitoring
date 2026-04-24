@@ -102,10 +102,10 @@ export default function ProjectDetailPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-16">
             <div className="space-y-6">
-              <h2 className="text-7xl font-black tracking-tighter text-slate-900 leading-[0.9] drop-shadow-sm">{project.name}</h2>
-              <div className="flex items-center gap-6 text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
+              <h2 className="text-4xl md:text-7xl font-black tracking-tighter text-slate-900 leading-[0.9] drop-shadow-sm">{project.name}</h2>
+              <div className="flex flex-wrap items-center gap-4 md:gap-6 text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
                 <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-yellow-500"></span> Proyek Logistik</span>
-                <span className="w-1.5 h-1.5 bg-slate-200 rounded-full"></span>
+                <span className="hidden md:inline w-1.5 h-1.5 bg-slate-200 rounded-full"></span>
                 <span>{project.items.length} Item Terdaftar</span>
               </div>
             </div>
@@ -123,25 +123,25 @@ export default function ProjectDetailPage() {
                   <div key={item.id} className="group relative">
                     <Link 
                       href={`/projects/${project.id}/inventory/${item.id}`}
-                      className="block glass-card-strong p-8 rounded-[40px] border-yellow-400/30 bg-gradient-to-br from-white/95 to-yellow-50/60 hover:border-yellow-500/60 hover:shadow-2xl hover:shadow-yellow-500/10 transition-all relative z-10"
+                      className="block glass-card-strong p-6 md:p-8 rounded-[32px] md:rounded-[40px] border-yellow-400/30 bg-gradient-to-br from-white/95 to-yellow-50/60 hover:border-yellow-500/60 hover:shadow-2xl hover:shadow-yellow-500/10 transition-all relative z-10"
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-8 text-left">
-                          <div className="w-16 h-16 rounded-[24px] bg-yellow-500/10 border border-yellow-500/10 flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-                            <Package className="w-7 h-7 text-amber-500" />
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4 md:gap-8 text-left">
+                          <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-[24px] bg-yellow-500/10 border border-yellow-500/10 flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+                            <Package className="w-6 h-6 md:w-7 md:h-7 text-amber-500" />
                           </div>
                           <div>
-                            <h4 className="text-2xl font-black text-slate-900 group-hover:text-amber-600 transition-colors uppercase tracking-tight">{item.name}</h4>
-                            <div className="flex items-center gap-4 mt-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            <h4 className="text-lg md:text-2xl font-black text-slate-900 group-hover:text-amber-600 transition-colors uppercase tracking-tight">{item.name}</h4>
+                            <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-1.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">
                               <span className="text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded-md">{item.itemCode}</span>
-                              <span className="w-1.5 h-1.5 bg-slate-200 rounded-full"></span>
+                              <span className="hidden md:inline w-1.5 h-1.5 bg-slate-200 rounded-full"></span>
                               <span>Satuan: {item.unit}</span>
                             </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-6">
-                          <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-yellow-500 group-hover:text-black group-hover:shadow-lg group-hover:shadow-yellow-500/20 transition-all">
-                            <ChevronRight className="w-6 h-6" />
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-yellow-500 group-hover:text-black group-hover:shadow-lg group-hover:shadow-yellow-500/20 transition-all">
+                            <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                           </div>
                         </div>
                       </div>
@@ -163,13 +163,13 @@ export default function ProjectDetailPage() {
           </div>
 
           {/* Sidebar Area: Form */}
-          <div className="space-y-8">
-            <div className="glass-card-strong rounded-[48px] p-10 border-yellow-400/30 shadow-xl sticky top-28 bg-gradient-to-br from-white/95 to-yellow-50/60">
-              <div className="flex items-center gap-4 mb-10">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-yellow-500/20">
+          <div className="space-y-8 lg:order-last order-first">
+            <div className="glass-card-strong rounded-[32px] md:rounded-[48px] p-6 md:p-10 border-yellow-400/30 shadow-xl lg:sticky lg:top-28 bg-gradient-to-br from-white/95 to-yellow-50/60">
+              <div className="flex items-center gap-4 mb-8 md:mb-10">
+                <div className="w-10 h-10 rounded-xl md:rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-yellow-500/20">
                   <Plus className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Katalog Baru</h3>
+                <h3 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-tight">Katalog Baru</h3>
               </div>
               
               <div className="space-y-8">
@@ -224,7 +224,7 @@ export default function ProjectDetailPage() {
               </div>
             </div>
 
-            <div className="glass-card-strong p-10 rounded-[48px] border-slate-100 bg-slate-50 shadow-sm relative overflow-hidden group">
+            <div className="glass-card-strong p-8 md:p-10 rounded-[32px] md:rounded-[48px] border-slate-100 bg-slate-50 shadow-sm relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/5 blur-3xl rounded-full"></div>
               <div className="flex items-center gap-4 mb-6 relative z-10">
                 <Settings className="w-5 h-5 text-slate-400 group-hover:rotate-90 transition-transform duration-700" />
@@ -233,7 +233,7 @@ export default function ProjectDetailPage() {
               <p className="text-xs text-slate-500 mb-8 leading-relaxed font-medium relative z-10">Status proyek menentukan kemunculan proyek di layar monitoring utama Pentaland.</p>
               <button 
                 onClick={async () => await toggleProjectStatus(project.id, project.status)}
-                className={`w-full py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] border transition-all relative z-10 ${project.status ? 'bg-white border-red-100 text-red-500 hover:bg-red-50' : 'bg-white border-green-100 text-green-600 hover:bg-green-50'}`}
+                className={`w-full py-4 md:py-5 rounded-xl md:rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] border transition-all relative z-10 ${project.status ? 'bg-white border-red-100 text-red-500 hover:bg-red-50' : 'bg-white border-green-100 text-green-600 hover:bg-green-50'}`}
               >
                 {project.status ? 'Hentikan Monitoring' : 'Mulai Monitoring'}
               </button>

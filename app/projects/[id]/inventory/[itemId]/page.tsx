@@ -78,16 +78,16 @@ export default function InventoryPage() {
 
       <header className="relative z-20 border-b border-yellow-500/20 backdrop-blur-xl bg-white/60 sticky top-0 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 md:gap-6">
             <Link 
               href={`/projects/${projectId}`}
-              className="w-12 h-12 rounded-2xl bg-white border border-yellow-200 flex items-center justify-center hover:bg-yellow-500 hover:text-black transition-all shadow-sm group"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-white border border-yellow-200 flex items-center justify-center hover:bg-yellow-500 hover:text-black transition-all shadow-sm group"
             >
               <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
             </Link>
             <div>
-              <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none mb-1">{item.name}</h1>
-              <p className="text-[10px] font-black text-amber-600 uppercase tracking-[0.2em] flex items-center gap-2">
+              <h1 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none mb-1">{item.name}</h1>
+              <p className="text-[9px] md:text-[10px] font-black text-amber-600 uppercase tracking-[0.2em] flex items-center gap-2">
                 {project.name} <span className="w-1 h-1 bg-yellow-200 rounded-full"></span> {item.itemCode}
               </p>
             </div>
@@ -105,13 +105,13 @@ export default function InventoryPage() {
         
         {/* Banner Stok Habis/Kritis */}
         {isCritical && (
-          <div className="bg-red-50 border border-red-100 rounded-[40px] p-8 flex items-center gap-8 animate-pulse shadow-xl shadow-red-500/5">
-            <div className="w-16 h-16 rounded-[24px] bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/20">
-              <AlertCircle className="w-8 h-8 text-white" />
+          <div className="bg-red-50 border border-red-100 rounded-[24px] md:rounded-[40px] p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-4 md:gap-8 animate-pulse shadow-xl shadow-red-500/5">
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-[24px] bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/20 shrink-0">
+              <AlertCircle className="w-6 h-6 md:w-8 md:h-8 text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-black text-red-600 uppercase tracking-tight">Peringatan: Stok Habis!</h3>
-              <p className="text-sm text-red-500/80 font-bold uppercase tracking-wider mt-1">Stok barang saat ini kosong. Segera lakukan pengadaan untuk melanjutkan proyek.</p>
+              <h3 className="text-lg md:text-xl font-black text-red-600 uppercase tracking-tight">Peringatan: Stok Habis!</h3>
+              <p className="text-[10px] md:text-sm text-red-500/80 font-bold uppercase tracking-wider mt-1">Stok barang saat ini kosong. Segera lakukan pengadaan untuk melanjutkan proyek.</p>
             </div>
           </div>
         )}
@@ -126,51 +126,51 @@ export default function InventoryPage() {
           <div className="space-y-8">
             <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.4em] ml-1">Menu Transaksi</h2>
             
-            <div className="glass-card-strong p-10 rounded-[48px] border-slate-100 space-y-5 bg-white/60 shadow-xl">
+            <div className="glass-card-strong p-6 md:p-10 rounded-[32px] md:rounded-[48px] border-slate-100 space-y-4 md:space-y-5 bg-white/60 shadow-xl">
               <button 
                 onClick={() => setIsModalInOpen(true)}
-                className="w-full group flex items-center gap-6 p-5 rounded-[32px] bg-blue-50 border border-blue-100 hover:bg-blue-500 hover:border-blue-500 transition-all text-left shadow-sm"
+                className="w-full group flex items-center gap-4 md:gap-6 p-4 md:p-5 rounded-[24px] md:rounded-[32px] bg-blue-50 border border-blue-100 hover:bg-blue-500 hover:border-blue-500 transition-all text-left shadow-sm"
               >
-                <div className="w-14 h-14 rounded-[20px] bg-blue-500 flex items-center justify-center group-hover:bg-white group-hover:scale-110 transition-all shadow-lg shadow-blue-500/20">
-                  <Plus className="w-7 h-7 text-white group-hover:text-blue-500" />
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-[20px] bg-blue-500 flex items-center justify-center group-hover:bg-white group-hover:scale-110 transition-all shadow-lg shadow-blue-500/20 shrink-0">
+                  <Plus className="w-6 h-6 md:w-7 md:h-7 text-white group-hover:text-blue-500" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 group-hover:text-white/80 transition-colors">Tambah Stok</p>
-                  <p className="text-lg font-black text-slate-900 group-hover:text-white transition-colors">Barang Masuk</p>
+                  <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 group-hover:text-white/80 transition-colors">Tambah Stok</p>
+                  <p className="text-base md:text-lg font-black text-slate-900 group-hover:text-white transition-colors">Barang Masuk</p>
                 </div>
               </button>
 
               <button 
                 onClick={() => setModalOutConfig({ open: true, type: 'OUT' })}
-                className="w-full group flex items-center gap-6 p-5 rounded-[32px] bg-purple-50 border border-purple-100 hover:bg-purple-500 hover:border-purple-500 transition-all text-left shadow-sm"
+                className="w-full group flex items-center gap-4 md:gap-6 p-4 md:p-5 rounded-[24px] md:rounded-[32px] bg-purple-50 border border-purple-100 hover:bg-purple-500 hover:border-purple-500 transition-all text-left shadow-sm"
               >
-                <div className="w-14 h-14 rounded-[20px] bg-purple-500 flex items-center justify-center group-hover:bg-white group-hover:scale-110 transition-all shadow-lg shadow-purple-500/20">
-                  <Send className="w-7 h-7 text-white group-hover:text-purple-500" />
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-[20px] bg-purple-500 flex items-center justify-center group-hover:bg-white group-hover:scale-110 transition-all shadow-lg shadow-purple-500/20 shrink-0">
+                  <Send className="w-6 h-6 md:w-7 md:h-7 text-white group-hover:text-purple-500" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-500 group-hover:text-white/80 transition-colors">Distribusi</p>
-                  <p className="text-lg font-black text-slate-900 group-hover:text-white transition-colors">Barang Keluar</p>
+                  <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-purple-500 group-hover:text-white/80 transition-colors">Distribusi</p>
+                  <p className="text-base md:text-lg font-black text-slate-900 group-hover:text-white transition-colors">Barang Keluar</p>
                 </div>
               </button>
 
               <button 
                 onClick={() => setModalOutConfig({ open: true, type: 'USAGE' })}
-                className="w-full group flex items-center gap-6 p-5 rounded-[32px] bg-yellow-50 border border-yellow-100 hover:bg-yellow-500 hover:border-yellow-500 transition-all text-left shadow-sm"
+                className="w-full group flex items-center gap-4 md:gap-6 p-4 md:p-5 rounded-[24px] md:rounded-[32px] bg-yellow-50 border border-yellow-100 hover:bg-yellow-500 hover:border-yellow-500 transition-all text-left shadow-sm"
               >
-                <div className="w-14 h-14 rounded-[20px] bg-yellow-500 flex items-center justify-center group-hover:bg-white group-hover:scale-110 transition-all shadow-lg shadow-yellow-500/20">
-                  <PenTool className="w-7 h-7 text-white group-hover:text-yellow-600" />
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-[20px] bg-yellow-500 flex items-center justify-center group-hover:bg-white group-hover:scale-110 transition-all shadow-lg shadow-yellow-500/20 shrink-0">
+                  <PenTool className="w-6 h-6 md:w-7 md:h-7 text-white group-hover:text-yellow-600" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 group-hover:text-white/80 transition-colors">Operasional</p>
-                  <p className="text-lg font-black text-slate-900 group-hover:text-white transition-colors">Pemakaian Aktual</p>
+                  <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 group-hover:text-white/80 transition-colors">Operasional</p>
+                  <p className="text-base md:text-lg font-black text-slate-900 group-hover:text-white transition-colors">Pemakaian Aktual</p>
                 </div>
               </button>
             </div>
 
-            <div className="glass-card-strong p-10 rounded-[48px] border-slate-100 bg-slate-50/50 relative overflow-hidden">
+            <div className="glass-card-strong p-8 md:p-10 rounded-[32px] md:rounded-[48px] border-slate-100 bg-slate-50/50 relative overflow-hidden">
                <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 blur-3xl rounded-full"></div>
               <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6">Informasi Teknis</h4>
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 <div className="flex items-center justify-between py-4 border-b border-slate-100">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Kode Katalog</span>
                   <span className="text-sm font-black text-slate-900 bg-white px-3 py-1 rounded-lg border border-slate-100">{item.itemCode}</span>
