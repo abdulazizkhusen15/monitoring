@@ -149,7 +149,9 @@ export default function ProjectDetailPage() {
                     <button 
                       onClick={async (e) => {
                         e.preventDefault();
-                        await removeProjectItem(project.id, item.id);
+                        if (confirm(`Apakah Anda yakin ingin menghapus "${item.name}" dari katalog? Seluruh data transaksi untuk barang ini akan ikut terhapus.`)) {
+                          await removeProjectItem(project.id, item.id);
+                        }
                       }}
                       className="absolute -right-3 -top-3 z-20 w-10 h-10 rounded-full bg-white border border-red-100 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shadow-xl"
                       aria-label="Hapus"
