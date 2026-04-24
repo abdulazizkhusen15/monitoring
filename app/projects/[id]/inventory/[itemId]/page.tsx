@@ -16,11 +16,13 @@ export default function InventoryPage() {
   const router = useRouter();
   const { loading, updateProjectItem } = useProject();
   
-  // Admin check - includes hardcoded admin accounts
+  // Admin check - immediate check for better responsiveness
   const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
-    const alias = localStorage.getItem('pentaland_user_alias');
-    setIsAdmin(['admin', 'henny', 'ko awi'].includes(alias || ''));
+    if (typeof window !== 'undefined') {
+      const alias = localStorage.getItem('pentaland_user_alias');
+      setIsAdmin(['admin', 'henny', 'ko awi'].includes(alias?.toLowerCase().trim() || ''));
+    }
   }, []);
   
   const { 
@@ -192,13 +194,14 @@ export default function InventoryPage() {
                 <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Pengaturan Item</h4>
                 {isAdmin && !isEditingLimits && (
                   <button 
+                    type="button"
                     onClick={() => {
                       setEditData({ quantityLimit: item.quantityLimit || 0, notes: item.notes || '' });
                       setIsEditingLimits(true);
                     }}
-                    className="text-[9px] font-black uppercase tracking-widest text-amber-600 hover:text-amber-700"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 border border-amber-100 text-[10px] font-black uppercase tracking-widest text-amber-600 hover:bg-amber-500 hover:text-white transition-all shadow-sm"
                   >
-                    Edit
+                    Edit Pengaturan
                   </button>
                 )}
               </div>
@@ -243,20 +246,22 @@ export default function InventoryPage() {
                 {isEditingLimits && (
                   <div className="flex gap-2 pt-2">
                     <button 
+                      type="button"
                       onClick={() => setIsEditingLimits(false)}
-                      className="flex-1 py-3 rounded-xl bg-slate-100 text-[9px] font-black uppercase tracking-widest text-slate-500"
+                      className="flex-1 py-4 rounded-2xl bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-200 transition-colors"
                     >
                       Batal
                     </button>
                     <button 
+                      type="button"
                       onClick={async () => {
                         const res = await updateProjectItem(item.id, editData);
                         if (res.success) setIsEditingLimits(false);
                         else alert(res.message);
                       }}
-                      className="flex-[2] py-3 rounded-xl bg-yellow-500 text-[9px] font-black uppercase tracking-widest text-white shadow-lg shadow-yellow-500/20"
+                      className="flex-[2] py-4 rounded-2xl bg-yellow-500 text-[10px] font-black uppercase tracking-widest text-white shadow-xl shadow-yellow-500/20 hover:bg-yellow-600 transition-colors"
                     >
-                      Simpan
+                      Simpan Perubahan
                     </button>
                   </div>
                 )}
