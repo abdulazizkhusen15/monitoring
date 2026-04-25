@@ -3,18 +3,25 @@
 import { InventoryTransaction } from '@/app/types/inventory';
 import { format, subDays, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { ArrowDownLeft, ArrowUpRight, Package, Search, Calendar } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Package, Search, Calendar, FileText } from 'lucide-react';
 import { useState } from 'react';
 
 interface GoodsTableProps {
   transactions: InventoryTransaction[];
   unit: string;
+  itemId?: string;
 }
 
-export default function GoodsTable({ transactions, unit }: GoodsTableProps) {
+export default function GoodsTable({ transactions, unit, itemId }: GoodsTableProps) {
   const [filter, setFilter] = useState<'ALL' | 'IN' | 'OUT' | 'USAGE'>('ALL');
   const [dateFilter, setDateFilter] = useState<'TODAY' | 'YESTERDAY' | '7DAYS' | '30DAYS' | 'CUSTOM'>('TODAY');
   const [customRange, setCustomRange] = useState({ start: '', end: '' });
+
+  const handleDownloadPDF = () => {
+    if (!itemId || !customRange.start || !customRange.end) return;
+    const url = `/api/report-inventory/${itemId}?start=${customRange.start}&end=${customRange.end}`;
+    window.open(url, '_blank');
+  };
 
   const now = new Date();
   
@@ -110,25 +117,37 @@ export default function GoodsTable({ transactions, unit }: GoodsTableProps) {
         </div>
 
         {dateFilter === 'CUSTOM' && (
-          <div className="flex flex-wrap items-center gap-4 animate-in slide-in-from-top-2 duration-300">
-            <div className="flex items-center gap-3">
-              <label className="text-[9px] font-black text-slate-400 uppercase">Dari:</label>
-              <input 
-                type="date" 
-                className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[10px] font-bold outline-none focus:border-yellow-500 transition-all"
-                value={customRange.start}
-                onChange={e => setCustomRange({...customRange, start: e.target.value})}
-              />
+          <div className="flex flex-wrap items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-300">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-3">
+                <label className="text-[9px] font-black text-slate-400 uppercase">Dari:</label>
+                <input 
+                  type="date" 
+                  className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[10px] font-bold outline-none focus:border-yellow-500 transition-all"
+                  value={customRange.start}
+                  onChange={e => setCustomRange({...customRange, start: e.target.value})}
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="text-[9px] font-black text-slate-400 uppercase">Sampai:</label>
+                <input 
+                  type="date" 
+                  className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[10px] font-bold outline-none focus:border-yellow-500 transition-all"
+                  value={customRange.end}
+                  onChange={e => setCustomRange({...customRange, end: e.target.value})}
+                />
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <label className="text-[9px] font-black text-slate-400 uppercase">Sampai:</label>
-              <input 
-                type="date" 
-                className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-[10px] font-bold outline-none focus:border-yellow-500 transition-all"
-                value={customRange.end}
-                onChange={e => setCustomRange({...customRange, end: e.target.value})}
-              />
-            </div>
+
+            {customRange.start && customRange.end && (
+              <button 
+                onClick={handleDownloadPDF}
+                className="flex items-center gap-2 px-6 py-2 rounded-xl bg-red-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                Unduh PDF
+              </button>
+            )}
           </div>
         )}
       </div>

@@ -362,7 +362,7 @@ export default function InventoryPage() {
           {/* Table Column */}
           <div className="lg:col-span-2 space-y-8">
             <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.4em] ml-1">Detail Pergerakan</h2>
-            <GoodsTable transactions={transactions} unit={item.unit} />
+            <GoodsTable transactions={transactions} unit={item.unit} itemId={itemId as string} />
           </div>
         </div>
       </main>
