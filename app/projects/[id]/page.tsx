@@ -5,7 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { VALID_UNITS, Unit } from '@/app/types/inventory';
-import { Package, Plus, ChevronRight, Settings } from 'lucide-react';
+import { Package, Plus, ChevronRight, Settings, Shield } from 'lucide-react';
+
+const ADMIN_ALIASES = ['admin', 'henny', 'ko awi'];
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
@@ -13,6 +15,8 @@ export default function ProjectDetailPage() {
   const { projects, loading, addProjectItem, removeProjectItem, toggleProjectStatus, isUnlocked } = useProject();
   
   const project = projects.find(p => p.id === id);
+  const alias = typeof window !== 'undefined' ? localStorage.getItem('pentaland_user_alias') : null;
+  const isAdmin = alias ? ADMIN_ALIASES.includes(alias.toLowerCase()) : false;
   
   const [itemName, setItemName] = useState('');
   const [itemCode, setItemCode] = useState('');
@@ -230,39 +234,49 @@ export default function ProjectDetailPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-5">
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Batas Stok (Opsi)</label>
-                    <input 
-                      type="number" 
-                      placeholder="600" 
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold"
-                      value={quantityLimit}
-                      onChange={(e) => setQuantityLimit(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Batas Pakai (Opsi)</label>
-                    <input 
-                      type="number" 
-                      placeholder="100" 
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold"
-                      value={usageLimit}
-                      onChange={(e) => setUsageLimit(e.target.value)}
-                    />
-                  </div>
-                </div>
+                {isAdmin && (
+                  <>
+                    <div className="pt-4 border-t border-dashed border-yellow-300/50">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Shield className="w-3.5 h-3.5 text-amber-500" />
+                        <span className="text-[9px] font-black text-amber-500 uppercase tracking-[0.2em]">Khusus Admin</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-5">
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Batas Stok (Opsi)</label>
+                          <input 
+                            type="number" 
+                            placeholder="600" 
+                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold"
+                            value={quantityLimit}
+                            onChange={(e) => setQuantityLimit(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Batas Pakai (Opsi)</label>
+                          <input 
+                            type="number" 
+                            placeholder="100" 
+                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold"
+                            value={usageLimit}
+                            onChange={(e) => setUsageLimit(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Catatan Batas Pakai (Opsi)</label>
-                  <textarea 
-                    placeholder="Alasan pembatasan..." 
-                    rows={2}
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold resize-none"
-                    value={usageLimitNotes}
-                    onChange={(e) => setUsageLimitNotes(e.target.value)}
-                  />
-                </div>
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Catatan Batas Pakai (Opsi)</label>
+                      <textarea 
+                        placeholder="Alasan pembatasan..." 
+                        rows={2}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold resize-none"
+                        value={usageLimitNotes}
+                        onChange={(e) => setUsageLimitNotes(e.target.value)}
+                      />
+                    </div>
+                  </>
+                )}
 
                 {error && <div className="p-5 bg-red-50 border border-red-100 rounded-[24px] text-red-600 text-[10px] font-black uppercase tracking-widest leading-relaxed">{error}</div>}
                 
