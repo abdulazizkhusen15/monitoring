@@ -17,6 +17,8 @@ export default function ProjectDetailPage() {
   const [itemName, setItemName] = useState('');
   const [itemCode, setItemCode] = useState('');
   const [unit, setUnit] = useState<Unit>(VALID_UNITS[0]);
+  const [quantityLimit, setQuantityLimit] = useState<string>('');
+  const [usageLimit, setUsageLimit] = useState<string>('');
   const [error, setError] = useState('');
 
   // Security Check: Redirect if project is locked and not admin
@@ -33,10 +35,19 @@ export default function ProjectDetailPage() {
     }
     if (!project) return;
     
-    const result = await addProjectItem(project.id, itemName, itemCode, unit);
+    const result = await addProjectItem(
+      project.id, 
+      itemName, 
+      itemCode, 
+      unit, 
+      quantityLimit ? Number(quantityLimit) : undefined,
+      usageLimit ? Number(usageLimit) : undefined
+    );
     if (result.success) {
       setItemName('');
       setItemCode('');
+      setQuantityLimit('');
+      setUsageLimit('');
       setError('');
     } else {
       setError(result.message);
@@ -212,6 +223,29 @@ export default function ProjectDetailPage() {
                          <ChevronRight className="w-4 h-4 rotate-90" />
                       </div>
                     </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-5">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Batas Stok (Opsi)</label>
+                    <input 
+                      type="number" 
+                      placeholder="600" 
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold"
+                      value={quantityLimit}
+                      onChange={(e) => setQuantityLimit(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Batas Pakai (Opsi)</label>
+                    <input 
+                      type="number" 
+                      placeholder="100" 
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold"
+                      value={usageLimit}
+                      onChange={(e) => setUsageLimit(e.target.value)}
+                    />
                   </div>
                 </div>
 

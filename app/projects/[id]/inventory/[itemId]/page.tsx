@@ -234,7 +234,7 @@ export default function InventoryPage() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 blur-3xl rounded-full -mr-20 -mt-20"></div>
             
             <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-[24px] md:rounded-[32px] bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-xl shadow-amber-500/30 shrink-0 rotate-3 group-hover:rotate-0 transition-transform duration-500">
-              <Package className="w-8 h-8 md:w-10 md:h-10 text-white" />
+              <AlertCircle className="w-8 h-8 md:w-10 md:h-10 text-white" />
             </div>
             
             <div className="relative">
@@ -358,6 +358,12 @@ export default function InventoryPage() {
                   ) : (
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-black text-slate-900">{item.usageLimit || '-'} {item.unit}</span>
+                      <div className="text-right">
+                        <span className="text-[9px] font-black text-slate-400 uppercase block">Terpakai Saat Ini</span>
+                        <span className={`text-[11px] font-black uppercase ${item.usageLimit && summary.totalUsage >= item.usageLimit ? 'text-red-500' : 'text-amber-600'}`}>
+                          {summary.totalUsage} {item.unit}
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>
