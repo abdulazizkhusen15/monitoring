@@ -243,7 +243,7 @@ export default function InventoryPage() {
                 <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-ping"></span>
                 Batas Tercapai
               </div>
-              <h3 className="text-xl md:text-3xl font-black text-amber-600 uppercase tracking-tighter leading-tight mb-2">Pagu Pemakaian Terpenuhi!</h3>
+              <h3 className="text-xl md:text-3xl font-black text-amber-600 uppercase tracking-tighter leading-tight mb-2">Batas Pemakaian Terpenuhi!</h3>
               <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wide leading-relaxed max-w-2xl">
                 Total pemakaian aktual <span className="text-amber-600 font-black">({summary.totalUsage} {item.unit})</span> telah mencapai atau melebihi batasan yang ditetapkan <span className="text-slate-900 font-black">({item.usageLimit} {item.unit})</span>. Mohon tinjau kembali operasional proyek.
               </p>
@@ -346,7 +346,7 @@ export default function InventoryPage() {
                 </div>
 
                 <div className="flex flex-col gap-2 py-4 border-b border-slate-100">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Batas Pemakaian (Pagu)</span>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Batas Pemakaian</span>
                   {isEditingLimits ? (
                     <div className="flex items-center gap-2">
                       <input 
