@@ -20,8 +20,8 @@ interface ProjectContextType {
   loading: boolean;
   addProject: (name: string) => Promise<{ success: boolean; message: string; data?: any }>;
   toggleProjectStatus: (id: string, currentStatus: boolean) => Promise<void>;
-  addProjectItem: (projectId: string, name: string, itemCode: string, unit: string, quantityLimit?: number, usageLimit?: number, notes?: string) => Promise<{ success: boolean; message: string; data?: any }>;
-  updateProjectItem: (itemId: string, data: { quantityLimit?: number; usageLimit?: number; notes?: string }) => Promise<{ success: boolean; message: string }>;
+  addProjectItem: (projectId: string, name: string, itemCode: string, unit: string, quantityLimit?: number, usageLimit?: number, notes?: string, usageLimitNotes?: string) => Promise<{ success: boolean; message: string; data?: any }>;
+  updateProjectItem: (itemId: string, data: { quantityLimit?: number; usageLimit?: number; notes?: string; usageLimitNotes?: string }) => Promise<{ success: boolean; message: string }>;
   addTransaction: (transaction: Omit<InventoryTransaction, 'id' | 'createdAt'>) => Promise<{ success: boolean; message: string; data?: any }>;
   removeProjectItem: (projectId: string, itemId: string) => Promise<void>;
   deleteProject: (id: string) => Promise<{ success: boolean; message: string }>;
@@ -100,6 +100,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
           isCompleted: i.is_completed,
           quantityLimit: i.quantity_limit,
           usageLimit: i.usage_limit,
+          usageLimitNotes: i.usage_limit_notes,
           notes: i.notes,
           createdAt: i.created_at
         })),
@@ -157,6 +158,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
             is_completed: i.isCompleted,
             quantity_limit: i.quantityLimit,
             usage_limit: i.usageLimit,
+            usage_limit_notes: i.usageLimitNotes,
             notes: i.notes
           }));
           
@@ -244,7 +246,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addProjectItem = async (projectId: string, name: string, itemCode: string, unit: string, quantityLimit?: number, usageLimit?: number, notes?: string) => {
+  const addProjectItem = async (projectId: string, name: string, itemCode: string, unit: string, quantityLimit?: number, usageLimit?: number, notes?: string, usageLimitNotes?: string) => {
     if (!user) return { success: false, message: 'Harus login' };
 
     const { data, error } = await supabase
@@ -257,6 +259,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
         unit,
         quantity_limit: quantityLimit,
         usage_limit: usageLimit,
+        usage_limit_notes: usageLimitNotes,
         notes
       })
       .select()
@@ -274,6 +277,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       unit: data.unit,
       quantityLimit: data.quantity_limit,
       usageLimit: data.usage_limit,
+      usageLimitNotes: data.usage_limit_notes,
       notes: data.notes,
       createdAt: data.created_at,
       isCompleted: data.is_completed
@@ -286,7 +290,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     return { success: true, message: 'Barang berhasil ditambahkan', data: newItem };
   };
 
-  const updateProjectItem = async (itemId: string, data: { quantityLimit?: number; usageLimit?: number; notes?: string }) => {
+  const updateProjectItem = async (itemId: string, data: { quantityLimit?: number; usageLimit?: number; notes?: string; usageLimitNotes?: string }) => {
     if (!user) return { success: false, message: 'Harus login' };
 
     const { error } = await supabase
@@ -294,6 +298,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       .update({
         quantity_limit: data.quantityLimit,
         usage_limit: data.usageLimit,
+        usage_limit_notes: data.usageLimitNotes,
         notes: data.notes
       })
       .eq('id', itemId);

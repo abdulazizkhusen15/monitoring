@@ -19,6 +19,7 @@ export default function ProjectDetailPage() {
   const [unit, setUnit] = useState<Unit>(VALID_UNITS[0]);
   const [quantityLimit, setQuantityLimit] = useState<string>('');
   const [usageLimit, setUsageLimit] = useState<string>('');
+  const [usageLimitNotes, setUsageLimitNotes] = useState<string>('');
   const [error, setError] = useState('');
 
   // Security Check: Redirect if project is locked and not admin
@@ -41,13 +42,16 @@ export default function ProjectDetailPage() {
       itemCode, 
       unit, 
       quantityLimit ? Number(quantityLimit) : undefined,
-      usageLimit ? Number(usageLimit) : undefined
+      usageLimit ? Number(usageLimit) : undefined,
+      undefined, // general notes (existing parameter order)
+      usageLimitNotes
     );
     if (result.success) {
       setItemName('');
       setItemCode('');
       setQuantityLimit('');
       setUsageLimit('');
+      setUsageLimitNotes('');
       setError('');
     } else {
       setError(result.message);
@@ -247,6 +251,17 @@ export default function ProjectDetailPage() {
                       onChange={(e) => setUsageLimit(e.target.value)}
                     />
                   </div>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Catatan Batas Pakai (Opsi)</label>
+                  <textarea 
+                    placeholder="Alasan pembatasan..." 
+                    rows={2}
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold resize-none"
+                    value={usageLimitNotes}
+                    onChange={(e) => setUsageLimitNotes(e.target.value)}
+                  />
                 </div>
 
                 {error && <div className="p-5 bg-red-50 border border-red-100 rounded-[24px] text-red-600 text-[10px] font-black uppercase tracking-widest leading-relaxed">{error}</div>}

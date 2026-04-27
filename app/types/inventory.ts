@@ -21,6 +21,7 @@ export interface ProjectItem {
   isCompleted: boolean;
   quantityLimit?: number;
   usageLimit?: number;
+  usageLimitNotes?: string;
   notes?: string;
 }
 

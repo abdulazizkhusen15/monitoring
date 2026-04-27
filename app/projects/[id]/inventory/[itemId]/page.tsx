@@ -47,7 +47,7 @@ export default function InventoryPage() {
   const [isModalInOpen, setIsModalInOpen] = useState(false);
   const [modalOutConfig, setModalOutConfig] = useState<{ open: boolean, type: 'OUT' | 'USAGE' }>({ open: false, type: 'OUT' });
   const [isEditingLimits, setIsEditingLimits] = useState(false);
-  const [editData, setEditData] = useState({ quantityLimit: 0, usageLimit: 0, notes: '' });
+  const [editData, setEditData] = useState({ quantityLimit: 0, usageLimit: 0, notes: '', usageLimitNotes: '' });
 
   // Sync editData when item loads or changes
   useEffect(() => {
@@ -55,6 +55,7 @@ export default function InventoryPage() {
       setEditData({ 
         quantityLimit: item.quantityLimit || 0, 
         usageLimit: item.usageLimit || 0,
+        usageLimitNotes: item.usageLimitNotes || '',
         notes: item.notes || '' 
       });
     }
@@ -312,6 +313,7 @@ export default function InventoryPage() {
                       setEditData({ 
                         quantityLimit: item.quantityLimit || 0, 
                         usageLimit: item.usageLimit || 0,
+                        usageLimitNotes: item.usageLimitNotes || '',
                         notes: item.notes || '' 
                       });
                       setIsEditingLimits(true);
@@ -365,6 +367,23 @@ export default function InventoryPage() {
                         </span>
                       </div>
                     </div>
+
+                <div className="flex flex-col gap-2 py-4 border-b border-slate-100">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Catatan Batas Pemakaian</span>
+                  {isEditingLimits ? (
+                    <textarea 
+                      value={editData.usageLimitNotes}
+                      onChange={(e) => setEditData({ ...editData, usageLimitNotes: e.target.value })}
+                      placeholder="Alasan pembatasan (misal: Sesuai anggaran RAB Tahap 1)..."
+                      rows={2}
+                      className="w-full bg-white border border-yellow-200 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-yellow-500/20 resize-none"
+                    />
+                  ) : (
+                    <p className="text-[11px] font-bold text-slate-500 leading-relaxed italic">
+                      {item.usageLimitNotes || 'Tidak ada catatan khusus untuk batas ini.'}
+                    </p>
+                  )}
+                </div>
                   )}
                 </div>
 
