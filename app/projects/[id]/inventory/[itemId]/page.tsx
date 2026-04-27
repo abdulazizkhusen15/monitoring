@@ -367,6 +367,8 @@ export default function InventoryPage() {
                         </span>
                       </div>
                     </div>
+                  )}
+                </div>
 
                 <div className="flex flex-col gap-2 py-4 border-b border-slate-100">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Catatan Batas Pemakaian</span>
@@ -382,8 +384,6 @@ export default function InventoryPage() {
                     <p className="text-[11px] font-bold text-slate-500 leading-relaxed italic">
                       {item.usageLimitNotes || 'Tidak ada catatan khusus untuk batas ini.'}
                     </p>
-                  )}
-                </div>
                   )}
                 </div>
 
