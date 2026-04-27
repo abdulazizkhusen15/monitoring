@@ -35,10 +35,12 @@ export default function Home() {
 
       const normalizedUser = username.toLowerCase().trim();
       let isValid = false;
+      let userRole = 'logistic';
 
       // 1. Check Static Accounts
       if (staticAccounts[normalizedUser] && staticAccounts[normalizedUser] === password) {
         isValid = true;
+        userRole = 'admin';
       } 
       // 2. Check Dynamic Logistic Users from Database
       else {
@@ -51,6 +53,7 @@ export default function Home() {
         
         if (logUser && !logError) {
           isValid = true;
+          userRole = logUser.role || 'logistic';
         }
       }
 
@@ -76,6 +79,7 @@ export default function Home() {
 
       // Save username for local permission checking
       localStorage.setItem('pentaland_user_alias', normalizedUser);
+      localStorage.setItem('pentaland_user_role', userRole);
 
       // Refresh and hard redirect to ensure cookies are sent
       router.refresh();

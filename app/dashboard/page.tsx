@@ -13,7 +13,7 @@ export default function DashboardPage() {
   
   const [isAdmin, setIsAdmin] = useState(false);
   const [logisticUsers, setLogisticUsers] = useState<any[]>([]);
-  const [newUser, setNewUser] = useState({ username: '', pin: '' });
+  const [newUser, setNewUser] = useState({ username: '', pin: '', role: 'logistic' });
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
@@ -34,9 +34,9 @@ export default function DashboardPage() {
     if (!newUser.username || !newUser.pin) return;
     
     setActionLoading(true);
-    const res = await addLogisticUser(newUser.username, newUser.pin);
+    const res = await addLogisticUser(newUser.username, newUser.pin, newUser.role);
     if (res.success) {
-      setNewUser({ username: '', pin: '' });
+      setNewUser({ username: '', pin: '', role: 'logistic' });
       await loadLogisticUsers();
     } else {
       alert(res.message);
@@ -187,6 +187,17 @@ export default function DashboardPage() {
                         onChange={e => setNewUser({...newUser, pin: e.target.value})}
                       />
                     </div>
+                    <div>
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1">Role Akses</label>
+                      <select 
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-black uppercase text-[10px] tracking-widest"
+                        value={newUser.role}
+                        onChange={e => setNewUser({...newUser, role: e.target.value})}
+                      >
+                        <option value="logistic">Logistic</option>
+                        <option value="pengawas">Pengawas</option>
+                      </select>
+                    </div>
                     <button 
                       disabled={actionLoading}
                       className="w-full py-5 rounded-2xl bg-slate-900 text-white font-black uppercase tracking-widest text-[10px] shadow-xl shadow-slate-900/20 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
@@ -224,7 +235,7 @@ export default function DashboardPage() {
                             </div>
                             <div>
                               <p className="text-sm font-black text-slate-900 uppercase tracking-tight">{u.username}</p>
-                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Role: Logistic</p>
+                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Role: {u.role || 'Logistic'}</p>
                             </div>
                           </div>
                           <button 

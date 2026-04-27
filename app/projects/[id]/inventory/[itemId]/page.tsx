@@ -17,10 +17,13 @@ export default function InventoryPage() {
   const { loading, updateProjectItem } = useProject();
   
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isPengawas, setIsPengawas] = useState(false);
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const alias = localStorage.getItem('pentaland_user_alias');
+      const role = localStorage.getItem('pentaland_user_role');
       setIsAdmin(['admin', 'henny', 'ko awi'].includes(alias?.toLowerCase().trim() || ''));
+      setIsPengawas(role === 'pengawas');
     }
   }, []);
 
@@ -306,7 +309,7 @@ export default function InventoryPage() {
                <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 blur-3xl rounded-full"></div>
               <div className="flex items-center justify-between mb-6">
                 <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Pengaturan Item</h4>
-                {isAdmin && !isEditingLimits && (
+                {(isAdmin || isPengawas) && !isEditingLimits && (
                   <button 
                     type="button"
                     onClick={() => {

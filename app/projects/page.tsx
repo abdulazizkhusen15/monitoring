@@ -23,7 +23,8 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     const alias = localStorage.getItem('pentaland_user_alias');
-    setIsAdmin(alias === 'admin');
+    const role = localStorage.getItem('pentaland_user_role');
+    setIsAdmin(alias === 'admin' || role === 'admin');
   }, []);
 
   const handleAddProject = async () => {

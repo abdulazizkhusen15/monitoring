@@ -26,7 +26,7 @@ interface ProjectContextType {
   removeProjectItem: (projectId: string, itemId: string) => Promise<void>;
   deleteProject: (id: string) => Promise<{ success: boolean; message: string }>;
   updateProjectPin: (id: string, pin: string | null) => Promise<{ success: boolean; message: string }>;
-  addLogisticUser: (username: string, pin: string) => Promise<{ success: boolean; message: string }>;
+  addLogisticUser: (username: string, pin: string, role: string) => Promise<{ success: boolean; message: string }>;
   deleteLogisticUser: (id: string) => Promise<{ success: boolean; message: string }>;
   getLogisticUsers: () => Promise<any[]>;
   unlockedPins: Record<string, string>;
@@ -392,13 +392,17 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     return { success: true, message: 'PIN proyek berhasil diperbarui' };
   };
 
-  const addLogisticUser = async (username: string, pin: string) => {
+  const addLogisticUser = async (username: string, pin: string, role: string) => {
     const { error } = await supabase
       .from('logistic_users')
-      .insert({ username: username.toLowerCase().trim(), password: pin });
+      .insert({ 
+        username: username.toLowerCase().trim(), 
+        password: pin,
+        role: role 
+      });
     
     if (error) return { success: false, message: error.code === '23505' ? 'Username sudah digunakan' : error.message };
-    return { success: true, message: 'Pengguna Logistic berhasil ditambahkan' };
+    return { success: true, message: 'Pengguna berhasil ditambahkan' };
   };
 
   const deleteLogisticUser = async (id: string) => {
@@ -419,7 +423,8 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     
     // Admin always has access
     const alias = typeof window !== 'undefined' ? localStorage.getItem('pentaland_user_alias') : null;
-    if (alias === 'admin') return true;
+    const role = typeof window !== 'undefined' ? localStorage.getItem('pentaland_user_role') : null;
+    if (alias === 'admin' || role === 'admin') return true;
 
     // Check if the pin used to unlock matches the current pin
     return unlockedPins[id] === project.pin;
