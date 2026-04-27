@@ -20,15 +20,20 @@ interface ModalProps {
   unit: string;
   type: 'OUT' | 'USAGE';
   maxQuantity: number;
+  usageLimit?: number;
+  currentTotalUsage?: number;
 }
 
-export default function ModalGoodsOut({ isOpen, onClose, onSubmit, unit, type, maxQuantity }: ModalProps) {
-  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<FormData>({
+export default function ModalGoodsOut({ isOpen, onClose, onSubmit, unit, type, maxQuantity, usageLimit, currentTotalUsage = 0 }: ModalProps) {
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset, watch } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       date: new Date().toISOString().split('T')[0]
     }
   });
+  
+  const quantity = watch('quantity') || 0;
+  const isOverUsageLimit = !!(type === 'USAGE' && usageLimit && (currentTotalUsage + quantity) > usageLimit);
 
   if (!isOpen) return null;
 
@@ -64,6 +69,19 @@ export default function ModalGoodsOut({ isOpen, onClose, onSubmit, unit, type, m
         </div>
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 md:p-10 space-y-6 md:space-y-8 bg-white/90">
+          {isOverUsageLimit && (
+            <div className="bg-red-50 border border-red-200 p-4 rounded-2xl flex items-start gap-4 animate-bounce">
+              <div className="w-8 h-8 rounded-lg bg-red-500 flex items-center justify-center shrink-0">
+                <Package className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-red-600 uppercase tracking-wider">Peringatan: Batas Pemakaian Tercapai!</p>
+                <p className="text-[11px] text-red-500 font-bold uppercase mt-0.5">
+                  Input ini ({quantity} {unit}) akan membuat total pemakaian ({currentTotalUsage + quantity} {unit}) melebihi batasan ({usageLimit} {unit}).
+                </p>
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div className="space-y-3">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Tanggal Transaksi</label>
@@ -81,11 +99,16 @@ export default function ModalGoodsOut({ isOpen, onClose, onSubmit, unit, type, m
                 type="number"
                 step="0.01"
                 {...register('quantity', { valueAsNumber: true })}
-                className="w-full bg-slate-50 border border-slate-100 rounded-xl md:rounded-2xl px-6 py-4 focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 outline-none transition-all text-slate-900 font-bold"
+                className={`w-full bg-slate-50 border rounded-xl md:rounded-2xl px-6 py-4 outline-none transition-all text-slate-900 font-bold focus:ring-4 ${isOverUsageLimit ? 'border-red-500 focus:ring-red-500/10' : 'border-slate-100 focus:ring-yellow-500/10 focus:border-yellow-500'}`}
               />
               <div className="flex items-center justify-between mt-1 px-1">
-                 {errors.quantity && <p className="text-[10px] text-red-500 font-black uppercase">{errors.quantity.message}</p>}
-                 <span className="text-[9px] text-slate-400 font-black uppercase ml-auto">Tersedia: {maxQuantity} {unit}</span>
+                  {errors.quantity && <p className="text-[10px] text-red-500 font-black uppercase">{errors.quantity.message}</p>}
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="text-[9px] text-slate-400 font-black uppercase">Tersedia: {maxQuantity} {unit}</span>
+                    {type === 'USAGE' && usageLimit && (
+                      <span className="text-[9px] text-amber-600 font-black uppercase">Sisa Kuota: {Math.max(0, usageLimit - currentTotalUsage)} {unit}</span>
+                    )}
+                  </div>
               </div>
             </div>
           </div>
@@ -110,8 +133,8 @@ export default function ModalGoodsOut({ isOpen, onClose, onSubmit, unit, type, m
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className={`order-1 sm:order-2 flex-[2] px-8 md:px-12 py-4 md:py-5 rounded-xl md:rounded-2xl shadow-xl active:scale-95 transition-transform text-white font-black uppercase tracking-widest text-[10px] md:text-xs ${type === 'OUT' ? 'bg-purple-600 shadow-purple-500/20' : 'bg-yellow-500 shadow-yellow-500/20'}`}
+              disabled={isSubmitting || isOverUsageLimit}
+              className={`order-1 sm:order-2 flex-[2] px-8 md:px-12 py-4 md:py-5 rounded-xl md:rounded-2xl shadow-xl active:scale-95 transition-transform text-white font-black uppercase tracking-widest text-[10px] md:text-xs ${isOverUsageLimit ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' : (type === 'OUT' ? 'bg-purple-600 shadow-purple-500/20' : 'bg-yellow-500 shadow-yellow-500/20')}`}
             >
               {isSubmitting ? 'Memproses...' : 'Simpan Transaksi'}
             </button>

@@ -20,6 +20,7 @@ export interface ProjectItem {
   createdAt: string;
   isCompleted: boolean;
   quantityLimit?: number;
+  usageLimit?: number;
   notes?: string;
 }
 

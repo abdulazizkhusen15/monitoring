@@ -20,8 +20,8 @@ interface ProjectContextType {
   loading: boolean;
   addProject: (name: string) => Promise<{ success: boolean; message: string; data?: any }>;
   toggleProjectStatus: (id: string, currentStatus: boolean) => Promise<void>;
-  addProjectItem: (projectId: string, name: string, itemCode: string, unit: string, quantityLimit?: number, notes?: string) => Promise<{ success: boolean; message: string; data?: any }>;
-  updateProjectItem: (itemId: string, data: { quantityLimit?: number; notes?: string }) => Promise<{ success: boolean; message: string }>;
+  addProjectItem: (projectId: string, name: string, itemCode: string, unit: string, quantityLimit?: number, usageLimit?: number, notes?: string) => Promise<{ success: boolean; message: string; data?: any }>;
+  updateProjectItem: (itemId: string, data: { quantityLimit?: number; usageLimit?: number; notes?: string }) => Promise<{ success: boolean; message: string }>;
   addTransaction: (transaction: Omit<InventoryTransaction, 'id' | 'createdAt'>) => Promise<{ success: boolean; message: string; data?: any }>;
   removeProjectItem: (projectId: string, itemId: string) => Promise<void>;
   deleteProject: (id: string) => Promise<{ success: boolean; message: string }>;
@@ -99,6 +99,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
           unit: i.unit,
           isCompleted: i.is_completed,
           quantityLimit: i.quantity_limit,
+          usageLimit: i.usage_limit,
           notes: i.notes,
           createdAt: i.created_at
         })),
@@ -155,6 +156,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
             unit: i.unit,
             is_completed: i.isCompleted,
             quantity_limit: i.quantityLimit,
+            usage_limit: i.usageLimit,
             notes: i.notes
           }));
           
@@ -242,7 +244,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addProjectItem = async (projectId: string, name: string, itemCode: string, unit: string, quantityLimit?: number, notes?: string) => {
+  const addProjectItem = async (projectId: string, name: string, itemCode: string, unit: string, quantityLimit?: number, usageLimit?: number, notes?: string) => {
     if (!user) return { success: false, message: 'Harus login' };
 
     const { data, error } = await supabase
@@ -254,6 +256,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
         item_code: itemCode.trim(),
         unit,
         quantity_limit: quantityLimit,
+        usage_limit: usageLimit,
         notes
       })
       .select()
@@ -270,6 +273,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       itemCode: data.item_code,
       unit: data.unit,
       quantityLimit: data.quantity_limit,
+      usageLimit: data.usage_limit,
       notes: data.notes,
       createdAt: data.created_at,
       isCompleted: data.is_completed
@@ -282,13 +286,14 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     return { success: true, message: 'Barang berhasil ditambahkan', data: newItem };
   };
 
-  const updateProjectItem = async (itemId: string, data: { quantityLimit?: number; notes?: string }) => {
+  const updateProjectItem = async (itemId: string, data: { quantityLimit?: number; usageLimit?: number; notes?: string }) => {
     if (!user) return { success: false, message: 'Harus login' };
 
     const { error } = await supabase
       .from('project_items')
       .update({
         quantity_limit: data.quantityLimit,
+        usage_limit: data.usageLimit,
         notes: data.notes
       })
       .eq('id', itemId);

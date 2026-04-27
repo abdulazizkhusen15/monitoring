@@ -47,13 +47,14 @@ export default function InventoryPage() {
   const [isModalInOpen, setIsModalInOpen] = useState(false);
   const [modalOutConfig, setModalOutConfig] = useState<{ open: boolean, type: 'OUT' | 'USAGE' }>({ open: false, type: 'OUT' });
   const [isEditingLimits, setIsEditingLimits] = useState(false);
-  const [editData, setEditData] = useState({ quantityLimit: 0, notes: '' });
+  const [editData, setEditData] = useState({ quantityLimit: 0, usageLimit: 0, notes: '' });
 
   // Sync editData when item loads or changes
   useEffect(() => {
     if (item) {
       setEditData({ 
         quantityLimit: item.quantityLimit || 0, 
+        usageLimit: item.usageLimit || 0,
         notes: item.notes || '' 
       });
     }
@@ -226,6 +227,28 @@ export default function InventoryPage() {
             </div>
           </div>
         )}
+        
+        {/* Banner Melebihi Batas Pemakaian */}
+        {item.usageLimit && summary.totalUsage >= item.usageLimit && (
+          <div className="relative overflow-hidden bg-gradient-to-br from-amber-50 to-white/90 backdrop-blur-xl border border-amber-200/60 rounded-[32px] md:rounded-[48px] p-8 md:p-10 flex flex-col md:flex-row md:items-center gap-6 md:gap-10 shadow-2xl shadow-amber-500/5 group transition-all hover:shadow-amber-500/10">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 blur-3xl rounded-full -mr-20 -mt-20"></div>
+            
+            <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-[24px] md:rounded-[32px] bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-xl shadow-amber-500/30 shrink-0 rotate-3 group-hover:rotate-0 transition-transform duration-500">
+              <Package className="w-8 h-8 md:w-10 md:h-10 text-white" />
+            </div>
+            
+            <div className="relative">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/50 border border-amber-200 text-[9px] font-black text-amber-600 uppercase tracking-widest mb-3">
+                <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-ping"></span>
+                Batas Tercapai
+              </div>
+              <h3 className="text-xl md:text-3xl font-black text-amber-600 uppercase tracking-tighter leading-tight mb-2">Pagu Pemakaian Terpenuhi!</h3>
+              <p className="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-wide leading-relaxed max-w-2xl">
+                Total pemakaian aktual <span className="text-amber-600 font-black">({summary.totalUsage} {item.unit})</span> telah mencapai atau melebihi batasan yang ditetapkan <span className="text-slate-900 font-black">({item.usageLimit} {item.unit})</span>. Mohon tinjau kembali operasional proyek.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-6">
           <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.4em] ml-1">Statistik Inventaris</h2>
@@ -286,7 +309,11 @@ export default function InventoryPage() {
                   <button 
                     type="button"
                     onClick={() => {
-                      setEditData({ quantityLimit: item.quantityLimit || 0, notes: item.notes || '' });
+                      setEditData({ 
+                        quantityLimit: item.quantityLimit || 0, 
+                        usageLimit: item.usageLimit || 0,
+                        notes: item.notes || '' 
+                      });
                       setIsEditingLimits(true);
                     }}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 border border-amber-100 text-[10px] font-black uppercase tracking-widest text-amber-600 hover:bg-amber-500 hover:text-white transition-all shadow-sm"
@@ -312,6 +339,25 @@ export default function InventoryPage() {
                   ) : (
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-black text-slate-900">{item.quantityLimit || '-'} {item.unit}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2 py-4 border-b border-slate-100">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Batas Pemakaian (Pagu)</span>
+                  {isEditingLimits ? (
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="number" 
+                        value={editData.usageLimit}
+                        onChange={(e) => setEditData({ ...editData, usageLimit: Number(e.target.value) })}
+                        className="w-full bg-white border border-yellow-200 rounded-lg px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-yellow-500/20"
+                      />
+                      <span className="text-[10px] font-black text-slate-400 uppercase">{item.unit}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-black text-slate-900">{item.usageLimit || '-'} {item.unit}</span>
                     </div>
                   )}
                 </div>
@@ -393,6 +439,8 @@ export default function InventoryPage() {
           if (!res.success) alert(res.message);
         }}
         unit={item.unit}
+        usageLimit={item.usageLimit}
+        currentTotalUsage={summary.totalUsage}
       />
     </div>
   );
