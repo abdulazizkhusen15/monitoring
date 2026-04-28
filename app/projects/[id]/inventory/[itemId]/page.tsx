@@ -22,7 +22,7 @@ export default function InventoryPage() {
     if (typeof window !== 'undefined') {
       const alias = localStorage.getItem('pentaland_user_alias');
       const role = localStorage.getItem('pentaland_user_role');
-      setIsAdmin(['admin', 'henny', 'ko awi'].includes(alias?.toLowerCase().trim() || ''));
+      setIsAdmin(['admin'].includes(alias?.toLowerCase().trim() || ''));
       setIsPengawas(role === 'pengawas');
     }
   }, []);

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { VALID_UNITS, Unit } from '@/app/types/inventory';
 import { Package, Plus, ChevronRight, Settings, Shield } from 'lucide-react';
 
-const ADMIN_ALIASES = ['admin', 'henny', 'ko awi'];
+const ADMIN_ALIASES = ['admin'];
 
 export default function ProjectDetailPage() {
   const { id } = useParams();

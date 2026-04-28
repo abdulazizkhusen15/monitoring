@@ -28,9 +28,7 @@ export default function Home() {
     try {
       // Internal mapping for hardcoded authorized accounts
       const staticAccounts: Record<string, string> = {
-        'admin': 'admin',
-        'henny': 'heny',
-        'ko awi': 'ko awi'
+        'admin': 'Pentaland'
       };
 
       const normalizedUser = username.toLowerCase().trim();
